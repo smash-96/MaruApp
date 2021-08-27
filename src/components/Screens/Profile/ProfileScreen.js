@@ -35,8 +35,9 @@ import {
   selectUserGender,
   selectUserAge,
 } from "../../../slices/userInfoSlice";
-
+import { useNavigation } from "@react-navigation/native";
 import Picker from "../../Custom/Picker";
+import { Icon } from "react-native-elements";
 
 const ProfileScreen = () => {
   // console.disableYellowBox = true;
@@ -49,6 +50,7 @@ const ProfileScreen = () => {
   const userAddress = useSelector(selectUserAddress);
   const userGender = useSelector(selectUserGender);
   const userAge = useSelector(selectUserAge);
+  const navigation = useNavigation();
 
   const baseAvatar =
     "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg";
@@ -99,13 +101,45 @@ const ProfileScreen = () => {
     }
   };
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: "MARU Profile",
+      headerStyle: { backgroundColor: "#2c88d1" },
+      headerTitleStyle: { color: "white" },
+      headerLeft: () => (
+        <View style={{ marginLeft: 20 }}>
+          <TouchableOpacity
+            onPress={() => navigation.toggleDrawer()}
+            activeOpacity={0.5}
+          >
+            <Icon name="menu" />
+          </TouchableOpacity>
+
+          {/* <TouchableOpacity
+            onPress={() => navigation.toggleDrawer()}
+            style={tw`bg-gray-100 absolute top-16 left-8 z-50 p-3 rounded-full shadow-lg`}
+          >
+            <Icon name="menu" />
+          </TouchableOpacity> */}
+        </View>
+      ),
+      headerRight: () => (
+        <View style={{ marginRight: 20 }}>
+          <TouchableOpacity>
+            <Avatar
+              rounded
+              source={require("../../../assets/MessageLogo.png")}
+            />
+          </TouchableOpacity>
+        </View>
+      ),
+    });
+  }, [navigation]);
+
   useEffect(() => {
     if (userPhoto !== null) {
       setProfilePic(userPhoto);
     }
-    // if (userType !== null) {
-    //   setType(userType);
-    // }
   }, [userPhoto, profilePic]);
 
   const setProfilePicture = (img) => {
@@ -132,7 +166,7 @@ const ProfileScreen = () => {
       const name = filename.split(".").slice(0, -1).join(".");
       filename = name + Date.now() + "." + extension;
 
-      setUploading(true);
+      //setUploading(true);
       setTransferred(0);
 
       const reference = storage().ref(filename);
@@ -153,7 +187,7 @@ const ProfileScreen = () => {
         await task;
         const url = await reference.getDownloadURL();
 
-        setUploading(false);
+        //setUploading(false);
         setImage(baseAvatar);
 
         // Alert.alert(
@@ -171,6 +205,7 @@ const ProfileScreen = () => {
   };
 
   const submit = async () => {
+    setUploading(true);
     const cRef = db.collection("Users").doc(auth?.currentUser?.uid);
     cRef.update({
       fname: fname,
@@ -200,11 +235,14 @@ const ProfileScreen = () => {
         auth.currentUser.updateProfile({ photoURL: photoUrl });
       }
     }
+    setUploading(false);
   };
 
   //
   return (
-    <KeyboardAwareScrollView style={{ marginTop: "10%" }}>
+    <KeyboardAwareScrollView
+      style={{ paddingTop: "10%", backgroundColor: "#effdfe" }}
+    >
       <View>
         {/* PROFILE PICTURE */}
         <UserAvatar
@@ -327,16 +365,28 @@ const ProfileScreen = () => {
           </View>
         </View>
         <View style={styles.submit}>
-          <Button
-            containerStyle={{
-              margin: "10%",
+          {uploading === true ? (
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text>{transferred} % Completed</Text>
+              <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+          ) : (
+            <Button
+              containerStyle={{
+                margin: "10%",
 
-              borderRadius: 12,
-              width: "30%",
-            }}
-            title="Update"
-            onPress={submit}
-          />
+                borderRadius: 12,
+                width: "30%",
+              }}
+              title="Update"
+              onPress={submit}
+            />
+          )}
         </View>
       </View>
     </KeyboardAwareScrollView>

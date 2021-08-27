@@ -24,7 +24,7 @@ const dynamic_styles = () => {
     //
     singleRow: {
       flexDirection: "row",
-      backgroundColor: "white",
+      backgroundColor: "#effdfe",
       alignSelf: "stretch",
       width: width,
       justifyContent: "space-between",

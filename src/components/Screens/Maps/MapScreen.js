@@ -148,20 +148,6 @@ const MapScreen = () => {
     return unsubscribe;
   }, []);
 
-  const logout = () => {
-    console.log("Logout");
-    auth
-      .signOut()
-      .then(() => {
-        //Alert.alert("Log out", "User is logged out!");
-        console.log("User signed out!");
-        navigation.replace("Login");
-      })
-      .catch((err) => {
-        console.log("Error in siging out!");
-      });
-  };
-
   const simulatedGetMapRegion = () => ({
     latitude: LATITUDE,
     longitude: LONGITUDE,
@@ -423,8 +409,9 @@ const MapScreen = () => {
       <View
         style={{
           position: "absolute", //use absolute position to show button on top of the map
-          top: "50%", //for center align
-          alignSelf: "flex-end", //for align to right
+          bottom: 10,
+          justifyContent: "center",
+          left: "40%",
         }}
       >
         {userType !== "helper" ? (
@@ -438,7 +425,6 @@ const MapScreen = () => {
             onPress={helperAction}
           />
         )}
-        <Button title={"Logout"} onPress={logout} />
       </View>
       <View
         style={{

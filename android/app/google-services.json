@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "804750691319",
+    "firebase_url": "https://volunteerteam-1c46b.firebaseio.com",
+    "project_id": "volunteerteam-1c46b",
+    "storage_bucket": "volunteerteam-1c46b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:804750691319:android:a4d2c4dabcc764b871bcf2",
+        "android_client_info": {
+          "package_name": "com.maruapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "804750691319-51kboenh02j1c73cm0qbv46l6umu2ppj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5r-_-Loae6AZxXRASG7VkKBhTKMGpDSQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "804750691319-51kboenh02j1c73cm0qbv46l6umu2ppj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "804750691319-7e4kdvhmrb9ls41qpv55utrcs7akqmrv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "BONSAITOKYO"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

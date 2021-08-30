@@ -25,11 +25,13 @@ const ChatStack = () => {
         name="AudioChat"
         component={AudioChat}
         options={{ headerShown: false }}
+        mode="modal"
       />
       <Stack.Screen
         name="VideoChat"
         component={VideoChat}
         options={{ headerShown: false }}
+        mode="modal"
       />
     </Stack.Navigator>
   );

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { Avatar, Button } from "react-native-elements";
 import UserAvatar from "../../Custom/UserAvatar/UserAvatar";
@@ -50,7 +51,6 @@ const ProfileScreen = () => {
   const userGender = useSelector(selectUserGender);
   const userAge = useSelector(selectUserAge);
   const navigation = useNavigation();
-  const connecting = useSelector(selectConnecting);
 
   const baseAvatar =
     "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg";
@@ -101,62 +101,21 @@ const ProfileScreen = () => {
     }
   };
 
-  // Listener for audio/video calls
-  useEffect(() => {
-    const unsubscribe = db.collection("Users").onSnapshot((snapshot) => {
-      snapshot.forEach((user) => {
-        const chatID = () => {
-          const chatterID = auth?.currentUser?.uid;
-          const chateeID = user.data().uid;
-          const chatIDpre = [];
-          chatIDpre.push(chatterID);
-          chatIDpre.push(chateeID);
-          chatIDpre.sort();
-          return chatIDpre.join("_");
-        };
-
-        const cRef = db.collection("meet").doc(chatID());
-
-        cRef.onSnapshot(async (snapshot) => {
-          const data = snapshot.data();
-
-          // If there is offer for chatId, set the getting call flag
-          if (
-            data &&
-            data.offer &&
-            !connecting &&
-            data.chatType === "video" &&
-            (
-              await db.collection("Users").doc(auth?.currentUser?.uid).get()
-            ).data()?.connection !== "close"
-          ) {
-            //
-            db.collection("Users")
-              .doc(auth?.currentUser?.uid)
-              .update({ connection: "close" });
-            //
-
-            props.navigation.navigate("VideoChat", {
-              callee: auth?.currentUser?.uid,
-              caller: user.data().uid,
-              photo: user.data().photoUrl,
-            });
-          }
-
-          if (data && data.offer && !connecting && data.chatType === "audio") {
-            props.navigation.navigate("AudioChat", {
-              callee: auth?.currentUser?.uid,
-              caller: user.data().uid,
-              photo: user.data().photoUrl,
-            });
-          }
-        });
-      });
-    });
-
-    return unsubscribe;
-  }, []);
-
+  function checkProfileComplete() {
+    if (
+      userAddress !== null &&
+      userAddress !== "" &&
+      userGender !== null &&
+      userGender !== "" &&
+      userAge !== null &&
+      userAge !== "" &&
+      userType !== null &&
+      userType !== null
+    ) {
+      return true;
+    }
+    return false;
+  }
   useLayoutEffect(() => {
     navigation.setOptions({
       title: "MARU Profile",
@@ -164,12 +123,26 @@ const ProfileScreen = () => {
       headerTitleStyle: { color: "white" },
       headerLeft: () => (
         <View style={{ marginLeft: 20 }}>
-          <TouchableOpacity
-            onPress={() => navigation.toggleDrawer()}
-            activeOpacity={0.5}
-          >
-            <Icon name="menu" />
-          </TouchableOpacity>
+          {checkProfileComplete() === true ? (
+            <TouchableOpacity
+              onPress={() => navigation.toggleDrawer()}
+              activeOpacity={0.5}
+            >
+              <Icon name="menu" />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={() => {
+                Alert.alert(
+                  "Profile Incomplete",
+                  "Kindly complete your profile to navigate the app!"
+                );
+              }}
+              activeOpacity={0.5}
+            >
+              <Icon name="menu" color="red" />
+            </TouchableOpacity>
+          )}
 
           {/* <TouchableOpacity
             onPress={() => navigation.toggleDrawer()}

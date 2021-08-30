@@ -42,7 +42,7 @@ function CustomDrawerContent(props) {
     auth
       .signOut()
       .then(() => {
-        navigation.replace("Login");
+        //navigation.replace("Login");
         console.log("Navigate to login!");
       })
       .catch((err) => {

@@ -30,8 +30,7 @@ const Login = (props) => {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
       if (authUser) {
         props.navigation.replace("MapStack");
-        //props.navigation.replace("MapScreen");
-        //console.log(authUser);
+        console.log(authUser);
       }
     });
 

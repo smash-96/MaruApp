@@ -534,7 +534,7 @@ export const VideoChat = (props) => {
     );
   }
 
-  return <View style={{ flex: 1, backgroundColor: "black" }}></View>;
+  return <View style={{ flex: 1, backgroundColor: "white" }}></View>;
 };
 
 // const styles = StyleSheet.create({

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Formik } from "formik";
-import { Button, TextInput, View, Text } from "react-native";
+import { Button, TextInput, View, Text, Pressable } from "react-native";
 import * as yup from "yup";
 import { db } from "../../../firebase/firebaseConfig";
 import { useSelector } from "react-redux";
@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { selectUserType } from "../../../slices/userInfoSlice";
 import UserAvatar from "../../Custom/UserAvatar/UserAvatar";
 import dynamic_styles from "./styles";
+import { Avatar } from "react-native-elements/dist/avatar/Avatar";
 
 const helpeeFieldsSchema = yup.object({
   //   title: yup.string().required().min(3),
@@ -41,42 +42,118 @@ const HelpForm = (props) => {
 
   if (userType === "helpee") {
     return (
-      <View>
+      // <View style={styles.centeredView}>
+      //   <View style={styles.modalView}>
+      //     <Text style={styles.modalText}>Fill to get help</Text>
+      //     <View>
+      //       <View>
+      //         <Text style={{ fontWeight: "bold", marginBottom: 4 }}>
+      //           Subject
+      //         </Text>
+      //         <TextInput
+      //           style={styles.input}
+      //           onChangeText={setHelpeeSubject}
+      //           value={helpeeSubject}
+      //           placeholder="Please enter your subject"
+      //         />
+      //         <Text style={{ fontWeight: "bold", marginBottom: 4 }}>
+      //           Details
+      //         </Text>
+      //         <TextInput
+      //           style={styles.Detailsinput}
+      //           onChangeText={setHelpeeDetails}
+      //           value={helpeeDetails}
+      //           placeholder="Please enter your details"
+      //           multiline={true}
+      //           numberOfLines={3}
+      //         />
+      //         <Text style={{ fontWeight: "bold", marginBottom: 4 }}>Time</Text>
+      //         <TextInput
+      //           style={styles.input}
+      //           onChangeText={setHelpeeTime}
+      //           value={helpeeTime}
+      //           placeholder="Please enter the time of delivery"
+      //         />
+      //       </View>
+      //     </View>
+      //     <View style={{ marginTop: 10 }}>
+      //       <Pressable
+      //         style={[styles.button, styles.buttonSubmit]}
+      //         onPress={() => console.log("submit")}
+      //       >
+      //         <Text style={styles.textStyle}>Submit</Text>
+      //       </Pressable>
+      //     </View>
+      //     <View style={{ marginTop: 10 }}>
+      //       <Pressable
+      //         style={[styles.button, styles.buttonClose]}
+      //         onPress={props.onClose}
+      //       >
+      //         <Text style={styles.textStyle}>Close</Text>
+      //       </Pressable>
+      //     </View>
+      //   </View>
+      // </View>
+
+      <View style={styles.centeredView}>
         <Formik
           initialValues={{ subject: "", details: "", time: "" }}
           //validationSchema={helpeeFieldsSchema}
           onSubmit={(values) => props.onSubmit(values)}
         >
           {(formikProps) => (
-            <View>
-              <TextInput
-                style={styles.subject}
-                placeholder="Subject"
-                // automatically handles the state of the form
-                onChangeText={formikProps.handleChange("subject")}
-                value={formikProps.values.subject}
-              />
-              <TextInput
-                multiline
-                style={styles.details}
-                placeholder="Details"
-                onChangeText={formikProps.handleChange("details")}
-                value={formikProps.values.details}
-              />
-              <TextInput
-                style={styles.time}
-                placeholder="Time"
-                onChangeText={formikProps.handleChange("time")}
-                value={formikProps.values.time}
-                keyboardType="numeric"
-              />
-              <View style={styles.buttons}>
-                <Button
-                  title="Request Help!"
-                  color="green"
-                  onPress={formikProps.handleSubmit}
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>Fill to get help</Text>
+              <View>
+                <Text style={{ fontWeight: "bold", marginBottom: 4 }}>
+                  Subject
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Subject"
+                  // automatically handles the state of the form
+                  onChangeText={formikProps.handleChange("subject")}
+                  value={formikProps.values.subject}
                 />
-                <Button title="Close" color="crimson" onPress={props.onClose} />
+
+                <Text style={{ fontWeight: "bold", marginBottom: 4 }}>
+                  Details
+                </Text>
+                <TextInput
+                  multiline
+                  style={styles.Detailsinput}
+                  placeholder="Details"
+                  onChangeText={formikProps.handleChange("details")}
+                  value={formikProps.values.details}
+                />
+
+                <Text style={{ fontWeight: "bold", marginBottom: 4 }}>
+                  Time
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Time"
+                  onChangeText={formikProps.handleChange("time")}
+                  value={formikProps.values.time}
+                  keyboardType="numeric"
+                />
+              </View>
+
+              <View style={{ marginTop: 10 }}>
+                <Pressable
+                  style={[styles.button, styles.buttonSubmit]}
+                  onPress={formikProps.handleSubmit}
+                >
+                  <Text style={styles.textStyle}>Submit</Text>
+                </Pressable>
+              </View>
+              <View style={{ marginTop: 10 }}>
+                <Pressable
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={props.onClose}
+                >
+                  <Text style={styles.textStyle}>Close</Text>
+                </Pressable>
               </View>
             </View>
           )}
@@ -104,20 +181,49 @@ const HelpForm = (props) => {
     }, []);
 
     return (
-      <View style={styles.container}>
-        <Text>{helpeeName}</Text>
-        <Text>{helpeeSubject}</Text>
-        <Text>{helpeeDetails}</Text>
-        <Text>{helpeeTime}</Text>
-        <UserAvatar profilePic={helpeePhoto} drawer={true} />
-
-        <View style={styles.buttons}>
-          <Button
-            title="Accept Request"
-            color="green"
-            onPress={props.onSubmit}
-          />
-          <Button title="Close" color="crimson" onPress={props.onClose} />
+      <View style={styles.centeredView}>
+        <View style={styles.modalView}>
+          <View style={{ alignItems: "center", marginTop: 20 }}>
+            <UserAvatar profilePic={helpeePhoto} drawer={true} />
+          </View>
+          {/* <Text
+            style={{
+              color: "black",
+              marginTop: "3%",
+              //fontFamily: "sans-serif-condensed",
+              fontSize: 20,
+            }}
+          >
+            {helpeeName}
+          </Text> */}
+          {/* Empty View */}
+          <View style={styles.modalText}></View>
+          <View>
+            <View>
+              <Text style={{ marginBottom: 4 }}>Subject</Text>
+              <Text style={styles.input}>{helpeeSubject}</Text>
+              <Text style={{ marginBottom: 4 }}>Details</Text>
+              <Text style={styles.Detailsinput}>{helpeeDetails}</Text>
+              <Text style={{ marginBottom: 4 }}>Time</Text>
+              <Text style={styles.input}>{helpeeTime}</Text>
+            </View>
+          </View>
+          <View style={{ marginTop: 10 }}>
+            <Pressable
+              style={[styles.button, styles.buttonSubmit]}
+              onPress={props.onSubmit}
+            >
+              <Text style={styles.textStyle}>Accept Request</Text>
+            </Pressable>
+          </View>
+          <View style={{ marginTop: 10 }}>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={props.onClose}
+            >
+              <Text style={styles.textStyle}>Reject Request</Text>
+            </Pressable>
+          </View>
         </View>
       </View>
     );

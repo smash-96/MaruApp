@@ -46,63 +46,63 @@ import AuthStack from "./src/navigations/AuthStack";
 import { NavigationContainer } from "@react-navigation/native";
 import { auth, db } from "./src/firebase/firebaseConfig";
 
-import { useDispatch } from "react-redux";
-import {
-  setUserType,
-  setUserPhoto,
-  setUserFname,
-  setUserLname,
-  setUserEmail,
-  setUserAddress,
-  setUserGender,
-  setUserAge,
-} from "./src/slices/userInfoSlice";
+// import { useDispatch } from "react-redux";
+// import {
+//   setUserType,
+//   setUserPhoto,
+//   setUserFname,
+//   setUserLname,
+//   setUserEmail,
+//   setUserAddress,
+//   setUserGender,
+//   setUserAge,
+// } from "./src/slices/userInfoSlice";
 
 const App = () => {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
-  useEffect(() => {
-    const getData = async () => {
-      const docData = await db
-        .collection("Users")
-        .doc(auth?.currentUser?.uid)
-        .get();
-      const userPhoto = docData.data()?.photoUrl;
-      const userType = docData.data()?.userType;
-      const userFname = docData.data()?.fname;
-      const userLname = docData.data()?.lname;
-      const userEmail = docData.data()?.email;
-      const userAddress = docData.data()?.Address;
-      const userGender = docData.data()?.Gender;
-      const userAge = docData.data()?.Age;
-      if (userPhoto) {
-        dispatch(setUserPhoto(userPhoto));
-      }
-      if (userType) {
-        dispatch(setUserType(userType));
-      }
+  // useEffect(() => {
+  //   const getData = async () => {
+  //     const docData = await db
+  //       .collection("Users")
+  //       .doc(auth?.currentUser?.uid)
+  //       .get();
+  //     const userPhoto = docData.data()?.photoUrl;
+  //     const userType = docData.data()?.userType;
+  //     const userFname = docData.data()?.fname;
+  //     const userLname = docData.data()?.lname;
+  //     const userEmail = docData.data()?.email;
+  //     const userAddress = docData.data()?.Address;
+  //     const userGender = docData.data()?.Gender;
+  //     const userAge = docData.data()?.Age;
+  //     if (userPhoto) {
+  //       dispatch(setUserPhoto(userPhoto));
+  //     }
+  //     if (userType) {
+  //       dispatch(setUserType(userType));
+  //     }
 
-      if (userFname) {
-        dispatch(setUserFname(userFname));
-      }
-      if (userLname) {
-        dispatch(setUserLname(userLname));
-      }
-      if (userEmail) {
-        dispatch(setUserEmail(userEmail));
-      }
-      if (userAddress) {
-        dispatch(setUserAddress(userAddress));
-      }
-      if (userGender) {
-        dispatch(setUserGender(userGender));
-      }
-      if (userAge) {
-        dispatch(setUserAge(userAge));
-      }
-    };
-    getData();
-  }, []);
+  //     if (userFname) {
+  //       dispatch(setUserFname(userFname));
+  //     }
+  //     if (userLname) {
+  //       dispatch(setUserLname(userLname));
+  //     }
+  //     if (userEmail) {
+  //       dispatch(setUserEmail(userEmail));
+  //     }
+  //     if (userAddress) {
+  //       dispatch(setUserAddress(userAddress));
+  //     }
+  //     if (userGender) {
+  //       dispatch(setUserGender(userGender));
+  //     }
+  //     if (userAge) {
+  //       dispatch(setUserAge(userAge));
+  //     }
+  //   };
+  //   getData();
+  // }, []);
   return (
     <NavigationContainer>
       <AuthStack />

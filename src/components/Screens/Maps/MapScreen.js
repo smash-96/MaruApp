@@ -65,7 +65,7 @@ const MapScreen = () => {
   const [t_id, setT_id] = useState(null);
 
   // Place in profile section later
-  const notif = new NotifService();
+  //const notif = new NotifService();
   useEffect(() => {
     // Notification Stuff
     // When the application is running, but in the background
@@ -376,16 +376,16 @@ const MapScreen = () => {
 
   return (
     <View>
-      <Modal visible={helpeeModalOpen}>
-        <View style={styles.modalContent}>
+      <Modal transparent={true} visible={helpeeModalOpen}>
+        <View>
           <HelpForm
             onSubmit={(request) => broadcastRequest(request)}
             onClose={() => setHelpeeModalOpen(false)}
           />
         </View>
       </Modal>
-      <Modal visible={helperModalOpen}>
-        <View style={styles.modalContent}>
+      <Modal transparent={true} visible={helperModalOpen}>
+        <View>
           <HelpForm
             onSubmit={acceptRequest}
             onClose={() => {
@@ -410,8 +410,8 @@ const MapScreen = () => {
         style={{
           position: "absolute", //use absolute position to show button on top of the map
           bottom: 10,
-          justifyContent: "center",
-          left: "40%",
+          alignItems: "center",
+          width: "100%",
         }}
       >
         {userType !== "helper" ? (

@@ -1,5 +1,11 @@
 import React, { useState, useLayoutEffect } from "react";
-import { SafeAreaView, Text } from "react-native";
+import {
+  SafeAreaView,
+  Text,
+  View,
+  TouchableNativeFeedback,
+  ScrollView,
+} from "react-native";
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -9,7 +15,6 @@ import {
 import MapScreen from "../components/Screens/Maps/MapScreen";
 import ProfileScreen from "../components/Screens/Profile/ProfileScreen";
 import SettingScreen from "../components/Screens/Settings/SettingScreen";
-//import { ChatScreen } from "../components/Screens/Chat/ChatScreen/ChatScreen";
 import UserAvatar from "../components/Custom/UserAvatar/UserAvatar";
 import { useSelector } from "react-redux";
 import { selectUserPhoto } from "../slices/userInfoSlice";
@@ -24,6 +29,8 @@ function CustomDrawerContent(props) {
     "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg";
   const [profilePic, setProfilePic] = useState(baseAvatar || "");
 
+  const ripple = TouchableNativeFeedback.Ripple("#adacac", false);
+
   useLayoutEffect(() => {
     if (userPhoto !== null) {
       setProfilePic(userPhoto);
@@ -35,32 +42,67 @@ function CustomDrawerContent(props) {
     auth
       .signOut()
       .then(() => {
-        //Alert.alert("Log out", "User is logged out!");
-        console.log("User signed out!");
         navigation.replace("Login");
+        console.log("Navigate to login!");
       })
       .catch((err) => {
-        console.log("Error in siging out!");
+        console.log("Error in siging out!", err);
       });
   };
   return (
-    <DrawerContentScrollView {...props}>
-      <UserAvatar profilePic={profilePic} drawer={true} />
-      <DrawerItemList {...props} />
-      <DrawerItem
-        label="Logout"
-        onPress={logout}
-        icon={({ focused, size }) => (
-          <Icon
-            name="logout"
-            type="MaterialCommunityIcons"
-            size={size}
-            color={focused ? "#2c88d1" : "#ccc"}
+    <View style={{ flex: 1 }}>
+      <ScrollView>
+        <SafeAreaView
+          style={{ flex: 1 }}
+          forceInset={{ top: "always", horizontal: "never" }}
+        >
+          <View
+            style={[
+              { paddingTop: "8%", paddingBottom: "4%" },
+              { backgroundColor: "#2c88d1" },
+            ]}
+          >
+            <View style={{ justifyContent: "center", alignItems: "center" }}>
+              <UserAvatar profilePic={profilePic} drawer={true} />
+              <Text
+                style={{
+                  color: "#f9f9f9",
+                  marginTop: "3%",
+                  fontFamily: "sans-serif-condensed",
+                  fontSize: 20,
+                }}
+              >
+                Hello {auth?.currentUser?.displayName}
+              </Text>
+              <Text
+                style={{
+                  color: "#f9f9f9",
+                  fontFamily: "sans-serif-condensed",
+                  fontSize: 15,
+                }}
+              >
+                {auth?.currentUser?.email}
+              </Text>
+            </View>
+          </View>
+
+          <DrawerItemList {...props} />
+          <DrawerItem
+            label="Logout"
+            onPress={logout}
+            icon={({ focused, size }) => (
+              <Icon
+                name="logout"
+                type="MaterialCommunityIcons"
+                size={size}
+                color={focused ? "#2c88d1" : "#ccc"}
+              />
+            )}
+            labelStyle={{ fontSize: 20, color: "black" }}
           />
-        )}
-        labelStyle={{ fontSize: 20, color: "black" }}
-      />
-    </DrawerContentScrollView>
+        </SafeAreaView>
+      </ScrollView>
+    </View>
   );
 }
 

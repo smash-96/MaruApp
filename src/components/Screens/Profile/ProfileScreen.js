@@ -15,7 +15,7 @@ import { auth, db } from "../../../firebase/firebaseConfig";
 import firestore from "@react-native-firebase/firestore";
 import storage from "@react-native-firebase/storage";
 import dynamic_styles from "./styles";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   setUserType,
   setUserPhoto,
@@ -25,7 +25,6 @@ import {
   setUserGender,
   setUserAge,
 } from "../../../slices/userInfoSlice";
-import { useSelector } from "react-redux";
 import {
   selectUserPhoto,
   selectUserType,
@@ -34,13 +33,13 @@ import {
   selectUserAddress,
   selectUserGender,
   selectUserAge,
+  selectConnecting,
 } from "../../../slices/userInfoSlice";
 import { useNavigation } from "@react-navigation/native";
 import Picker from "../../Custom/Picker";
 import { Icon } from "react-native-elements";
 
 const ProfileScreen = () => {
-  // console.disableYellowBox = true;
   const styles = dynamic_styles();
   const dispatch = useDispatch();
   const userPhoto = useSelector(selectUserPhoto);
@@ -51,6 +50,7 @@ const ProfileScreen = () => {
   const userGender = useSelector(selectUserGender);
   const userAge = useSelector(selectUserAge);
   const navigation = useNavigation();
+  const connecting = useSelector(selectConnecting);
 
   const baseAvatar =
     "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg";
@@ -100,6 +100,62 @@ const ProfileScreen = () => {
       set_type_placeHolder(null);
     }
   };
+
+  // Listener for audio/video calls
+  useEffect(() => {
+    const unsubscribe = db.collection("Users").onSnapshot((snapshot) => {
+      snapshot.forEach((user) => {
+        const chatID = () => {
+          const chatterID = auth?.currentUser?.uid;
+          const chateeID = user.data().uid;
+          const chatIDpre = [];
+          chatIDpre.push(chatterID);
+          chatIDpre.push(chateeID);
+          chatIDpre.sort();
+          return chatIDpre.join("_");
+        };
+
+        const cRef = db.collection("meet").doc(chatID());
+
+        cRef.onSnapshot(async (snapshot) => {
+          const data = snapshot.data();
+
+          // If there is offer for chatId, set the getting call flag
+          if (
+            data &&
+            data.offer &&
+            !connecting &&
+            data.chatType === "video" &&
+            (
+              await db.collection("Users").doc(auth?.currentUser?.uid).get()
+            ).data()?.connection !== "close"
+          ) {
+            //
+            db.collection("Users")
+              .doc(auth?.currentUser?.uid)
+              .update({ connection: "close" });
+            //
+
+            props.navigation.navigate("VideoChat", {
+              callee: auth?.currentUser?.uid,
+              caller: user.data().uid,
+              photo: user.data().photoUrl,
+            });
+          }
+
+          if (data && data.offer && !connecting && data.chatType === "audio") {
+            props.navigation.navigate("AudioChat", {
+              callee: auth?.currentUser?.uid,
+              caller: user.data().uid,
+              photo: user.data().photoUrl,
+            });
+          }
+        });
+      });
+    });
+
+    return unsubscribe;
+  }, []);
 
   useLayoutEffect(() => {
     navigation.setOptions({

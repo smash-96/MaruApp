@@ -47,6 +47,7 @@ const Map = () => {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
   const [zoom, setZoom] = useState(false);
+  const [movingHelperLocation, setMovingHelperLocation] = useState(null);
   const mapRef = useRef();
 
   useEffect(() => {
@@ -118,48 +119,56 @@ const Map = () => {
   }, [latitude, longitude, loading]);
 
   // useEffect(() => {
-  //   const unsubscribe = Location.watchPositionAsync(
-  //     {
-  //       accuracy: Location.Accuracy.High,
-  //     },
-  //     (loc) => console.log("position", loc)
-  //   );
+  //   try {
+  //     //const { status } = requestPermissionsAsync();
+  //     const subscriber = Location.watchPositionAsync(
+  //       {
+  //         accuracy: Location.Accuracy.High,
+  //       },
+  //       (loc) => setMovingHelperLocation(JSON.parse(JSON.stringify(loc.coords)))
+  //     );
 
-  //   return unsubscribe;
-  // }, []);
+  //     if (status !== "granted") {
+  //       throw new Error("Watching Location permission not granted");
+  //     }
+  //     return subscriber;
+  //   } catch (err) {
+  //     console.log("Watch Positon Error", err);
+  //   }
+  // }, [movingHelperLocation]);
 
-  // useEffect(() => {
-  //   if (!helperLocation || !helpeeLocation) return;
-  //   // Zoom to fit markers
-  //   // mapRef.current.fitToCoordinates([
-  //   //   {
-  //   //     latitude: helperLocation.latitude,
-  //   //     longitude: helperLocation.longitude,
-  //   //   },
-  //   //   {
-  //   //     latitude: helpeeLocation.latitude,
-  //   //     longitude: helpeeLocation.longitude,
-  //   //   },
-  //   // ]);
-  //   // try {
-  //   //   if (mapRef.current) {
-  //   //     mapRef.current.fitToSuppliedMarkers([
-  //   //       "helperLocation",
-  //   //       "helpeeLocation",
-  //   //     ]);
-  //   //     console.log("fitToSuppliedMarkers");
-  //   //   }
-  //   // } catch (err) {
-  //   //   console.log("Marker Error", err);
-  //   // }
+  useEffect(() => {
+    if (!helperLocation || !helpeeLocation) return;
+    // Zoom to fit markers
+    // mapRef.current.fitToCoordinates([
+    //   {
+    //     latitude: helperLocation.latitude,
+    //     longitude: helperLocation.longitude,
+    //   },
+    //   {
+    //     latitude: helpeeLocation.latitude,
+    //     longitude: helpeeLocation.longitude,
+    //   },
+    // ]);
+    // try {
+    //   if (mapRef.current) {
+    //     mapRef.current.fitToSuppliedMarkers([
+    //       "helperLocation",
+    //       "helpeeLocation",
+    //     ]);
+    //     console.log("fitToSuppliedMarkers");
+    //   }
+    // } catch (err) {
+    //   console.log("Marker Error", err);
+    // }
 
-  //   mapRef.current.fitToSuppliedMarkers(["helperLocation", "helpeeLocation"], {
-  //     edgePadding: DEFAULT_PADDING,
-  //     animated: true,
-  //   });
+    mapRef.current.fitToSuppliedMarkers(["helperLocation", "helpeeLocation"], {
+      edgePadding: DEFAULT_PADDING,
+      animated: true,
+    });
 
-  //   //setZoom(true);
-  // }, [helperLocation, helpeeLocation]);
+    //setZoom(true);
+  }, [helperLocation, helpeeLocation]);
 
   // const fitAllMarkers = () => {
   //   try {

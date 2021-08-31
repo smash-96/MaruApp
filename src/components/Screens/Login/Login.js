@@ -1,13 +1,34 @@
-import React, { useEffect } from "react";
-import { Image, Text, View, TextInput, Alert } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  Image,
+  Text,
+  View,
+  TextInput,
+  Alert,
+  AppState,
+  Keyboard,
+} from "react-native";
 import Authentication_Button from "../../Custom/AuthenticationButton";
 import { SocialIcon } from "react-native-elements";
 import { Container, Content } from "native-base";
 import dynamic_styles from "./LoginStyles";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scrollview";
 import { auth } from "../../../firebase/firebaseConfig";
+import messaging from "@react-native-firebase/messaging";
 import I18n from "../../../localization/utils/language";
-//import MapStack from "../../../navigations/MapStack";
+import authManager from "../../Utils/AuthManager";
+import TNActivityIndicator from "../../Custom/TNActivityIndicator/TNActivityIndicator";
+import { useDispatch } from "react-redux";
+import {
+  setUserType,
+  setUserPhoto,
+  setUserFname,
+  setUserLname,
+  setUserEmail,
+  setUserAddress,
+  setUserGender,
+  setUserAge,
+} from "../../../slices/userInfoSlice";
 
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -25,28 +46,187 @@ const loginSchema = yup.object({
 
 const Login = (props) => {
   const styles = dynamic_styles();
+  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
+  // New code
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((authUser) => {
-      if (authUser) {
-        props.navigation.replace("MapStack");
-        console.log(authUser);
+    registerOnNotificationOpenedApp();
+    AppState.addEventListener("change", handleAppStateChange);
+    tryToLoginFirst();
+  }, []);
+
+  const handleAppStateChange = async (nextAppState) => {
+    console.log("handleAppStateChange");
+    const intialNotification = await messaging().getInitialNotification();
+
+    if (intialNotification && Platform.OS === "android") {
+      console.log(
+        "Notification caused app to open from quit state:",
+        intialNotification
+      );
+      // if (remoteMessage.data.type === "message") {
+      //   props.navigation.replace(remoteMessage.data.screen, {
+      //     //id: id,
+      //     uid: remoteMessage.data.uid,
+      //     fname: remoteMessage.data.fname,
+      //     lname: remoteMessage.data.lname,
+      //     //photo: photo,
+      //   });
+      // }
+    }
+  };
+
+  const tryToLoginFirst = async () => {
+    authManager
+      .retrievePersistedAuthUser()
+      .then((response) => {
+        if (response?.user) {
+          const user = response.user;
+          //console.log("USER_NEW", user);
+          // dispatch(
+          //   setUserData({
+          //     user: response.user,
+          //   })
+          // );
+          //
+          if (user.photoUrl) {
+            dispatch(setUserPhoto(user.photoUrl));
+          }
+          if (user.userType) {
+            dispatch(setUserType(user.userType));
+          } else {
+            dispatch(setUserType(""));
+          }
+          if (user.Gender) {
+            dispatch(setUserGender(user.Gender));
+          } else {
+            dispatch(setUserGender(""));
+          }
+
+          if (user.fname) {
+            dispatch(setUserFname(user.fname));
+          }
+          if (user.lname) {
+            dispatch(setUserLname(user.lname));
+          }
+          if (user.email) {
+            dispatch(setUserEmail(user.email));
+          }
+          if (user.Address) {
+            dispatch(setUserAddress(user.Address));
+          }
+
+          if (user.Age) {
+            dispatch(setUserAge(user.Age));
+          }
+          //
+          Keyboard.dismiss();
+          props.navigation.reset({
+            index: 0,
+            routes: [{ name: "MapStack", params: { user: user } }],
+          });
+          return;
+        }
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        setIsLoading(false);
+      });
+  };
+
+  const registerOnNotificationOpenedApp = async () => {
+    console.log("registerOnNotificationOpenedApp");
+    messaging().onNotificationOpenedApp((remoteMessage) => {
+      if (remoteMessage) {
+        console.log(
+          "Notification caused app to open from quit state:",
+          remoteMessage
+        );
+        // if (remoteMessage.data.type === "message") {
+        //   props.navigation.replace(remoteMessage.data.screen, {
+        //     //id: id,
+        //     uid: remoteMessage.data.uid,
+        //     fname: remoteMessage.data.fname,
+        //     lname: remoteMessage.data.lname,
+        //     //photo: photo,
+        //   });
+        // }
       }
     });
+    messaging().onMessage((remoteMessage) => {
+      if (remoteMessage && Platform.OS === "ios") {
+        const userID = currentUser?.id || currentUser?.userID;
+        updateUser(userID, { badgeCount: 0 });
+      }
+    });
+  };
+  //
 
-    return unsubscribe;
-  }, []);
+  // useEffect(() => {
+  //   const unsubscribe = auth.onAuthStateChanged((authUser) => {
+  //     if (authUser) {
+  //       props.navigation.replace("MapStack");
+  //       console.log(authUser);
+  //     }
+  //   });
+
+  //   return unsubscribe;
+  // }, []);
 
   const login = (values, actions) => {
     console.log("LOGIN");
+    setLoading(true);
     auth
       .signInWithEmailAndPassword(values.email, values.pass)
       .then(() => {
         console.log("User account created & signed in!");
         //Alert.alert("Logged in!", "User signed in!");
         //props.navigation.navigate("Home");
+
+        // //
+        // if (user.photoUrl) {
+        //   dispatch(setUserPhoto(user.photoUrl));
+        // }
+        // if (user.userType) {
+        //   dispatch(setUserType(user.userType));
+        // } else {
+        //   dispatch(setUserType(""));
+        // }
+        // if (user.Gender) {
+        //   dispatch(setUserGender(user.Gender));
+        // } else {
+        //   dispatch(setUserGender(""));
+        // }
+
+        // if (user.fname) {
+        //   dispatch(setUserFname(user.fname));
+        // }
+        // if (user.lname) {
+        //   dispatch(setUserLname(user.lname));
+        // }
+        // if (user.email) {
+        //   dispatch(setUserEmail(user.email));
+        // }
+        // if (user.Address) {
+        //   dispatch(setUserAddress(user.Address));
+        // }
+
+        // if (user.Age) {
+        //   dispatch(setUserAge(user.Age));
+        // }
+        // //
+
+        Keyboard.dismiss();
+        props.navigation.reset({
+          index: 0,
+          routes: [{ name: "MapStack", params: { user: "user" } }],
+        });
       })
       .catch((error) => {
+        setLoading(false);
         if (error.code === "auth/invalid-email") {
           console.log("That email address is invalid!");
           //Alert.alert("Invalid email!", "That email address is invalid!");
@@ -62,6 +242,10 @@ const Login = (props) => {
   const signup = () => {
     props.navigation.navigate("Signup");
   };
+
+  if (isLoading == true) {
+    return <TNActivityIndicator />;
+  }
 
   return (
     <KeyboardAwareScrollView>
@@ -150,6 +334,7 @@ const Login = (props) => {
           />
         </Content>
       </Container>
+      {loading && <TNActivityIndicator />}
     </KeyboardAwareScrollView>
   );
 };

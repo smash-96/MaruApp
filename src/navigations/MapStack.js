@@ -108,7 +108,7 @@ function CustomDrawerContent(props) {
 
 const Drawer = createDrawerNavigator();
 
-const MapStack = () => {
+const MapStack = (props) => {
   return (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}
@@ -121,6 +121,7 @@ const MapStack = () => {
       <Drawer.Screen
         name="ProfileScreen"
         component={ProfileScreen}
+        initialParams={{ user: props.route.params.user }}
         options={{
           unmountOnBlur: true,
           drawerLabel: ({ focused, size }) => (

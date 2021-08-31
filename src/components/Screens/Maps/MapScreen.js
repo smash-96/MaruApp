@@ -15,7 +15,6 @@ import { Avatar, Icon } from "react-native-elements";
 import { auth, db } from "../../../firebase/firebaseConfig";
 import { copyDoc, moveDoc } from "../../../firebase/firebaseUtil";
 import firestore from "@react-native-firebase/firestore";
-import messaging from "@react-native-firebase/messaging";
 import HelpForm from "../HelpDetailForm/HelpForm";
 import tw from "tailwind-react-native-classnames";
 import { useNavigation } from "@react-navigation/native";
@@ -33,7 +32,6 @@ import {
 } from "../../../slices/userInfoSlice";
 import uuid from "react-native-uuid";
 import haversine from "haversine";
-import NotifService from "../../../notifictions/NotifService";
 
 const { width, height } = Dimensions.get("window");
 
@@ -64,48 +62,6 @@ const MapScreen = () => {
   const navigation = useNavigation();
   const [t_id, setT_id] = useState(null);
 
-  // Place in profile section later
-  //const notif = new NotifService();
-  useEffect(() => {
-    // Notification Stuff
-    // When the application is running, but in the background
-    messaging().onNotificationOpenedApp((remoteMessage) => {
-      console.log(
-        "Notification caused app to open from background state:",
-        remoteMessage
-      );
-      // if (remoteMessage.data.type === "message") {
-      //   props.navigation.replace(remoteMessage.data.screen, {
-      //     //id: id,
-      //     uid: remoteMessage.data.uid,
-      //     fname: remoteMessage.data.fname,
-      //     lname: remoteMessage.data.lname,
-      //     photo: photo,
-      //   });
-      // }
-    });
-
-    // When the application is opened from a quit state
-    messaging()
-      .getInitialNotification()
-      .then((remoteMessage) => {
-        if (remoteMessage) {
-          console.log(
-            "Notification caused app to open from quit state:",
-            remoteMessage
-          );
-          // if (remoteMessage.data.type === "message") {
-          //   props.navigation.replace(remoteMessage.data.screen, {
-          //     //id: id,
-          //     uid: remoteMessage.data.uid,
-          //     fname: remoteMessage.data.fname,
-          //     lname: remoteMessage.data.lname,
-          //     //photo: photo,
-          //   });
-          // }
-        }
-      });
-  }, []);
   useEffect(() => {
     const cRef = db.collection("requests");
     const requestDelete = cRef.onSnapshot((snapshot) => {

@@ -1,5 +1,6 @@
 import React from "react";
 import { ImageBackground } from "react-native";
+import deviceStorage from "../../Utils/AuthDeviceStorage";
 import LanguageButton from "../../Custom/LanguageButton";
 
 import { setLocale } from "../../../localization/utils/language";
@@ -19,6 +20,7 @@ const SelectLanguage = (props) => {
         handlePress={() => {
           console.log("English");
           setLocale("en");
+          deviceStorage.setShouldShowOnboardingFlow("false");
           props.navigation.replace("Login");
         }}
       />
@@ -28,6 +30,7 @@ const SelectLanguage = (props) => {
         handlePress={() => {
           console.log("Japanese");
           setLocale("jp");
+          deviceStorage.setShouldShowOnboardingFlow("false");
           props.navigation.replace("Login");
         }}
       />

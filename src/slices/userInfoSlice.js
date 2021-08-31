@@ -10,6 +10,7 @@ const initialState = {
   userGender: null,
   userAge: null,
   userLocation: null,
+  userLanguage: null,
   //
   helperLocation: null,
   helpeeLocation: null,
@@ -47,6 +48,9 @@ export const userInfoSlice = createSlice({
     setUserLocation: (state, action) => {
       state.userLocation = action.payload;
     },
+    setUserLanguage: (state, action) => {
+      state.userLanguage = action.payload;
+    },
 
     //
     setHelperLocation: (state, action) => {
@@ -72,6 +76,7 @@ export const {
   setUserGender,
   setUserAge,
   setUserLocation,
+  setUserLanguage,
   //
   setHelperLocation,
   setHelpeeLocation,
@@ -88,6 +93,7 @@ export const selectUserAddress = (state) => state.user.userAddress;
 export const selectUserGender = (state) => state.user.userGender;
 export const selectUserAge = (state) => state.user.userAge;
 export const selectUserLocation = (state) => state.user.userLocation;
+export const selectUserLanguage = (state) => state.user.userLanguage;
 //
 export const selectHelperLocation = (state) => state.user.helperLocation;
 export const selectHelpeeLocation = (state) => state.user.helpeeLocation;

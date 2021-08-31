@@ -23,17 +23,17 @@ const options = {
     okButton: "ok",
   },
 };
-RNCallKeep.setup(options);
+//RNCallKeep.setup(options);
 
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
   console.log("Message handled in the background!", remoteMessage);
 
-  if (
-    remoteMessage.data.type === "video" ||
-    remoteMessage.data.type === "audio"
-  ) {
-    presentIncomingCall(remoteMessage);
-  }
+  // if (
+  //   remoteMessage.data.type === "video" ||
+  //   remoteMessage.data.type === "audio"
+  // ) {
+  //   presentIncomingCall(remoteMessage);
+  // }
 });
 
 presentIncomingCall = async (remoteMessage) => {

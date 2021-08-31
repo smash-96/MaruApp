@@ -165,38 +165,6 @@ const ChatScreen = (props) => {
     return unsubscribe;
   }, []);
 
-  // Place on profile page
-  const saveTokenToDatabase = async (token) => {
-    // Assume user is already signed in
-    const userId = auth?.currentUser?.uid;
-
-    // Add the token to the users datastore
-    await db
-      .collection("Users")
-      .doc(userId)
-      .update({
-        fcm_tokens: firestore.FieldValue.arrayUnion(token),
-      });
-  };
-
-  useEffect(() => {
-    // Get the device token
-    messaging()
-      .getToken()
-      .then((token) => {
-        return saveTokenToDatabase(token);
-      });
-
-    // If using other push notification providers (ie Amazon SNS, etc)
-    // you may need to get the APNs token instead for iOS:
-    // if(Platform.OS == 'ios') { messaging().getAPNSToken().then(token => { return saveTokenToDatabase(token); }); }
-
-    // Listen to whether the token changes
-    return messaging().onTokenRefresh((token) => {
-      saveTokenToDatabase(token);
-    });
-  }, []);
-
   return (
     <SafeAreaProvider style={{ backgroundColor: "#effdff" }}>
       <FlatList

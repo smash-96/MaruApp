@@ -40,7 +40,9 @@ import { useNavigation } from "@react-navigation/native";
 import Picker from "../../Custom/Picker";
 import { Icon } from "react-native-elements";
 
-const ProfileScreen = () => {
+const ProfileScreen = (props) => {
+  //console.log("PROPS_USER_INFO_?", props.route.params.user);
+  const navigation = useNavigation();
   const styles = dynamic_styles();
   const dispatch = useDispatch();
   const userPhoto = useSelector(selectUserPhoto);
@@ -50,7 +52,6 @@ const ProfileScreen = () => {
   const userAddress = useSelector(selectUserAddress);
   const userGender = useSelector(selectUserGender);
   const userAge = useSelector(selectUserAge);
-  const navigation = useNavigation();
 
   const baseAvatar =
     "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg";
@@ -265,6 +266,10 @@ const ProfileScreen = () => {
       }
     }
     setUploading(false);
+    Alert.alert(
+      "Profile Updated",
+      "Your profile has been updated with new information!"
+    );
   };
 
   //

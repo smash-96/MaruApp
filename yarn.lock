@@ -1546,6 +1546,11 @@
   dependencies:
     invariant "^2.2.4"
 
+"@react-native-community/geolocation@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@react-native-community/geolocation/-/geolocation-2.0.2.tgz#ba8b40f560ead8d014740d1cdea970b33f19312e"
+  integrity sha512-tTNXRCgnhJBu79mulQwzabXRpDqfh/uaDqfHVpvF0nX4NTpolpy6mvTRiFg7eWFPGRArsnZz1EYp6rHfJWGgEA==
+
 "@react-native-community/masked-view@^0.1.11":
   version "0.1.11"
   resolved "https://registry.yarnpkg.com/@react-native-community/masked-view/-/masked-view-0.1.11.tgz#2f4c6e10bee0786abff4604e39a37ded6f3980ce"
@@ -5711,6 +5716,13 @@ react-native-incall-manager@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/react-native-incall-manager/-/react-native-incall-manager-3.3.0.tgz#69f4ada83b5a8db464b1cfae368dadbae4a949eb"
   integrity sha512-SvomgHUoKqVso/BGv02b4ndBqenlqYqW3pptZz5qHwteidKFNWI6ny+PPw5X55MdK0lyTbzBoiT3DwS06Qu0lg==
+
+react-native-indicators@^0.17.0:
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/react-native-indicators/-/react-native-indicators-0.17.0.tgz#92f95efaf5fb53be576dfe4e1980a25655a93f55"
+  integrity sha512-s23em477GHGxWeGczWrixScAZD6tQU4mx1fttlrwhEGKOxhBgp55Kh3RoD9Wj4yna4e5W35xQNoPqoJAT6QW5A==
+  dependencies:
+    prop-types "^15.5.10"
 
 react-native-invertible-scroll-view@^2.0.0:
   version "2.0.0"

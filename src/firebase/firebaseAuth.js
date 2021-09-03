@@ -181,59 +181,58 @@ export const retrievePersistedAuthUser = () => {
 //   });
 // };
 
-// export const loginWithEmailAndPassword = async (email, password) => {
-//   return new Promise(function (resolve, reject) {
-//     firebase
-//       .auth()
-//       .signInWithEmailAndPassword(email, password)
-//       .then((response) => {
-//         const uid = response.user.uid;
+export const loginWithEmailAndPassword = async (email, password) => {
+  return new Promise(function (resolve, reject) {
+    auth
+      .signInWithEmailAndPassword(email, password)
+      .then((response) => {
+        const uid = response.user.uid;
 
-//         const userData = {
-//           email,
-//           password,
-//           id: uid,
-//         };
-//         usersRef
-//           .doc(uid)
-//           .get()
-//           .then(function (firestoreDocument) {
-//             if (!firestoreDocument.exists) {
-//               resolve({ errorCode: ErrorCode.noUser });
-//               return;
-//             }
-//             const user = firestoreDocument.data();
-//             const newUserData = {
-//               ...userData,
-//               ...user,
-//             };
-//             resolve({ user: newUserData });
-//           })
-//           .catch(function (_error) {
-//             console.log("_error:", _error);
-//             resolve({ error: ErrorCode.serverError });
-//           });
-//       })
-//       .catch((error) => {
-//         console.log("error:", error);
-//         var errorCode = ErrorCode.serverError;
-//         switch (error.code) {
-//           case "auth/wrong-password":
-//             errorCode = ErrorCode.invalidPassword;
-//             break;
-//           case "auth/network-request-failed":
-//             errorCode = ErrorCode.serverError;
-//             break;
-//           case "auth/user-not-found":
-//             errorCode = ErrorCode.noUser;
-//             break;
-//           default:
-//             errorCode = ErrorCode.serverError;
-//         }
-//         resolve({ error: errorCode });
-//       });
-//   });
-// };
+        const userData = {
+          email,
+          password,
+          id: uid,
+        };
+        usersRef
+          .doc(uid)
+          .get()
+          .then(function (firestoreDocument) {
+            if (!firestoreDocument.exists) {
+              resolve({ errorCode: "No User Error" });
+              return;
+            }
+            const user = firestoreDocument.data();
+            const newUserData = {
+              ...userData,
+              ...user,
+            };
+            resolve({ user: newUserData });
+          })
+          .catch(function (_error) {
+            console.log("_error:", _error);
+            resolve({ error: "Server Error" });
+          });
+      })
+      .catch((error) => {
+        console.log("error:", error);
+        // var errorCode = ErrorCode.serverError;
+        // switch (error.code) {
+        //   case "auth/wrong-password":
+        //     errorCode = ErrorCode.invalidPassword;
+        //     break;
+        //   case "auth/network-request-failed":
+        //     errorCode = ErrorCode.serverError;
+        //     break;
+        //   case "auth/user-not-found":
+        //     errorCode = ErrorCode.noUser;
+        //     break;
+        //   default:
+        //     errorCode = ErrorCode.serverError;
+        // }
+        resolve({ error: "Some Error Occured!" });
+      });
+  });
+};
 
 // export const loginWithApple = (identityToken, nonce, appIdentifier) => {
 //   const appleCredential = RNFBAuth.auth.AppleAuthProvider.credential(
@@ -479,6 +478,7 @@ export const getUserByID = async (userID) => {
 };
 
 const authAPI = {
+  loginWithEmailAndPassword,
   retrievePersistedAuthUser,
   fetchAndStorePushTokenIfPossible,
   getUserByID,

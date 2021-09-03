@@ -91,10 +91,13 @@ const MapScreen = () => {
           })
         );
         setT_id(data.helperID);
-        // Alert.alert(
-        //   "Help Request Accepted!",
-        //   "Someone has accepted to help you."
-        // );
+        let hName = (
+          await db.collection("Users").doc(data.helperID).get()
+        ).data().fname;
+        Alert.alert(
+          "Help Request Accepted!",
+          hName + " has agreed to help you. He'll be here shortly!"
+        );
         console.log("Help Accepted");
         // set for helpee
         setGiveHelp(false);

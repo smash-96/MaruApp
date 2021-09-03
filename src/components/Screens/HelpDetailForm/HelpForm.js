@@ -8,7 +8,6 @@ import { useSelector } from "react-redux";
 import { selectUserType } from "../../../slices/userInfoSlice";
 import UserAvatar from "../../Custom/UserAvatar/UserAvatar";
 import dynamic_styles from "./styles";
-import { Avatar } from "react-native-elements/dist/avatar/Avatar";
 
 const helpeeFieldsSchema = yup.object({
   //   title: yup.string().required().min(3),
@@ -42,59 +41,6 @@ const HelpForm = (props) => {
 
   if (userType === "helpee") {
     return (
-      // <View style={styles.centeredView}>
-      //   <View style={styles.modalView}>
-      //     <Text style={styles.modalText}>Fill to get help</Text>
-      //     <View>
-      //       <View>
-      //         <Text style={{ fontWeight: "bold", marginBottom: 4 }}>
-      //           Subject
-      //         </Text>
-      //         <TextInput
-      //           style={styles.input}
-      //           onChangeText={setHelpeeSubject}
-      //           value={helpeeSubject}
-      //           placeholder="Please enter your subject"
-      //         />
-      //         <Text style={{ fontWeight: "bold", marginBottom: 4 }}>
-      //           Details
-      //         </Text>
-      //         <TextInput
-      //           style={styles.Detailsinput}
-      //           onChangeText={setHelpeeDetails}
-      //           value={helpeeDetails}
-      //           placeholder="Please enter your details"
-      //           multiline={true}
-      //           numberOfLines={3}
-      //         />
-      //         <Text style={{ fontWeight: "bold", marginBottom: 4 }}>Time</Text>
-      //         <TextInput
-      //           style={styles.input}
-      //           onChangeText={setHelpeeTime}
-      //           value={helpeeTime}
-      //           placeholder="Please enter the time of delivery"
-      //         />
-      //       </View>
-      //     </View>
-      //     <View style={{ marginTop: 10 }}>
-      //       <Pressable
-      //         style={[styles.button, styles.buttonSubmit]}
-      //         onPress={() => console.log("submit")}
-      //       >
-      //         <Text style={styles.textStyle}>Submit</Text>
-      //       </Pressable>
-      //     </View>
-      //     <View style={{ marginTop: 10 }}>
-      //       <Pressable
-      //         style={[styles.button, styles.buttonClose]}
-      //         onPress={props.onClose}
-      //       >
-      //         <Text style={styles.textStyle}>Close</Text>
-      //       </Pressable>
-      //     </View>
-      //   </View>
-      // </View>
-
       <View style={styles.centeredView}>
         <Formik
           initialValues={{ subject: "", details: "", time: "" }}

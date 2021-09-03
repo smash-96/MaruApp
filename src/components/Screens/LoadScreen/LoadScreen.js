@@ -5,11 +5,13 @@ import { useNavigation } from "@react-navigation/native";
 import { auth } from "../../../firebase/firebaseConfig";
 import authManager from "../../Utils/AuthManager";
 import NotifService from "../../../notifictions/NotifService";
-// import { useDispatch } from 'react-redux';
-// import { setUserData } from '../redux/auth';
+import { useDispatch } from "react-redux";
+import { setUserLanguage } from "../../../slices/userInfoSlice";
+import { setLocale } from "../../../localization/utils/language";
 
 const LoadScreen = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   const didFocusSubscription = useRef(
     navigation.addListener("focus", (payload) => {
@@ -28,6 +30,10 @@ const LoadScreen = () => {
     const shouldShowOnboardingFlow =
       await deviceStorage.getShouldShowOnboardingFlow();
     if (!shouldShowOnboardingFlow) {
+      const appLanguage = await deviceStorage.getAppLanguage();
+      console.log("appLanguage", appLanguage);
+      dispatch(setUserLanguage(appLanguage));
+      setLocale(appLanguage);
       if (auth?.currentUser) {
         fetchPersistedUserIfNeeded();
         return;

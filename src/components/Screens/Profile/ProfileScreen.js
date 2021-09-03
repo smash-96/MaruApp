@@ -52,6 +52,7 @@ const ProfileScreen = (props) => {
   const userAddress = useSelector(selectUserAddress);
   const userGender = useSelector(selectUserGender);
   const userAge = useSelector(selectUserAge);
+  const connecting = useSelector(selectConnecting);
 
   const baseAvatar =
     "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg";
@@ -59,6 +60,7 @@ const ProfileScreen = (props) => {
   const [profilePic, setProfilePic] = useState(baseAvatar || "");
   const [uploading, setUploading] = useState(false);
   const [transferred, setTransferred] = useState(0);
+  const [profileCompleted, setProfileCompleted] = useState(false);
 
   const [fname, setFname] = useState(null);
   const [lname, setLname] = useState(null);
@@ -111,10 +113,12 @@ const ProfileScreen = (props) => {
       userAge !== null &&
       userAge !== "" &&
       userType !== null &&
-      userType !== null
+      userType !== ""
     ) {
+      //setProfileCompleted(true);
       return true;
     }
+    //setProfileCompleted(false);
     return false;
   }
   useLayoutEffect(() => {
@@ -165,6 +169,68 @@ const ProfileScreen = (props) => {
       ),
     });
   }, [navigation]);
+
+  // Listener for audio/video calls
+  useEffect(() => {
+    const unsubscribe = db.collection("Users").onSnapshot((snapshot) => {
+      snapshot.forEach((user) => {
+        const chatID = () => {
+          const chatterID = auth?.currentUser?.uid;
+          const chateeID = user.data().uid;
+          const chatIDpre = [];
+          chatIDpre.push(chatterID);
+          chatIDpre.push(chateeID);
+          chatIDpre.sort();
+          return chatIDpre.join("_");
+        };
+
+        const cRef = db.collection("meet").doc(chatID());
+
+        cRef.onSnapshot(async (snapshot) => {
+          const data = snapshot.data();
+
+          // If there is offer for chatId, set the getting call flag
+          if (
+            data &&
+            data.offer &&
+            !connecting &&
+            data.chatType === "video" &&
+            (
+              await db.collection("Users").doc(auth?.currentUser?.uid).get()
+            ).data()?.connection !== "close"
+          ) {
+            //
+            db.collection("Users")
+              .doc(auth?.currentUser?.uid)
+              .update({ connection: "close" });
+            //
+
+            navigation.navigate("Messages", {
+              screen: "VideoChat",
+              params: {
+                callee: auth?.currentUser?.uid,
+                caller: user.data().uid,
+                photo: user.data().photoUrl,
+              },
+            });
+          }
+
+          if (data && data.offer && !connecting && data.chatType === "audio") {
+            navigation.navigate("Messages", {
+              screen: "AudioChat",
+              params: {
+                callee: auth?.currentUser?.uid,
+                caller: user.data().uid,
+                photo: user.data().photoUrl,
+              },
+            });
+          }
+        });
+      });
+    });
+
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     if (userPhoto !== null) {
@@ -265,6 +331,8 @@ const ProfileScreen = (props) => {
         auth.currentUser.updateProfile({ photoURL: photoUrl });
       }
     }
+
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     setUploading(false);
     Alert.alert(
       "Profile Updated",
@@ -406,7 +474,8 @@ const ProfileScreen = (props) => {
                 alignItems: "center",
               }}
             >
-              <Text>{transferred} % Completed</Text>
+              {/* <Text>{transferred} % Completed</Text> */}
+              <Text>Updating</Text>
               <ActivityIndicator size="large" color="#0000ff" />
             </View>
           ) : (

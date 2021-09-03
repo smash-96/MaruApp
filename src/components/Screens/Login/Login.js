@@ -179,61 +179,54 @@ const Login = (props) => {
   const login = (values, actions) => {
     console.log("LOGIN");
     setLoading(true);
-    auth
-      .signInWithEmailAndPassword(values.email, values.pass)
-      .then(() => {
-        console.log("User account created & signed in!");
-        //Alert.alert("Logged in!", "User signed in!");
-        //props.navigation.navigate("Home");
+    authManager
+      .loginWithEmailAndPassword(values.email, values.pass)
+      .then((response) => {
+        if (response?.user) {
+          const user = response.user;
+          //
+          if (user.photoUrl) {
+            dispatch(setUserPhoto(user.photoUrl));
+          }
+          if (user.userType) {
+            dispatch(setUserType(user.userType));
+          } else {
+            dispatch(setUserType(""));
+          }
+          if (user.Gender) {
+            dispatch(setUserGender(user.Gender));
+          } else {
+            dispatch(setUserGender(""));
+          }
 
-        // //
-        // if (user.photoUrl) {
-        //   dispatch(setUserPhoto(user.photoUrl));
-        // }
-        // if (user.userType) {
-        //   dispatch(setUserType(user.userType));
-        // } else {
-        //   dispatch(setUserType(""));
-        // }
-        // if (user.Gender) {
-        //   dispatch(setUserGender(user.Gender));
-        // } else {
-        //   dispatch(setUserGender(""));
-        // }
+          if (user.fname) {
+            dispatch(setUserFname(user.fname));
+          }
+          if (user.lname) {
+            dispatch(setUserLname(user.lname));
+          }
+          if (user.email) {
+            dispatch(setUserEmail(user.email));
+          }
+          if (user.Address) {
+            dispatch(setUserAddress(user.Address));
+          }
 
-        // if (user.fname) {
-        //   dispatch(setUserFname(user.fname));
-        // }
-        // if (user.lname) {
-        //   dispatch(setUserLname(user.lname));
-        // }
-        // if (user.email) {
-        //   dispatch(setUserEmail(user.email));
-        // }
-        // if (user.Address) {
-        //   dispatch(setUserAddress(user.Address));
-        // }
-
-        // if (user.Age) {
-        //   dispatch(setUserAge(user.Age));
-        // }
-        // //
-
-        Keyboard.dismiss();
-        props.navigation.reset({
-          index: 0,
-          routes: [{ name: "MapStack", params: { user: "user" } }],
-        });
-      })
-      .catch((error) => {
-        setLoading(false);
-        if (error.code === "auth/invalid-email") {
-          console.log("That email address is invalid!");
-          //Alert.alert("Invalid email!", "That email address is invalid!");
+          if (user.Age) {
+            dispatch(setUserAge(user.Age));
+          }
+          //
+          Keyboard.dismiss();
+          props.navigation.reset({
+            index: 0,
+            routes: [{ name: "MapStack", params: { user: user } }],
+          });
+        } else {
+          setLoading(false);
+          Alert.alert("", response.error, [{ text: "OK" }], {
+            cancelable: false,
+          });
         }
-
-        console.error(error);
-        //Alert.alert("Error", "An error has occurred. Please try again!");
       });
 
     //actions.resetForm();

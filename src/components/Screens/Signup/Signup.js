@@ -1,5 +1,5 @@
-import React from "react";
-import { Image, Text, View, TextInput, Alert } from "react-native";
+import React, { useState } from "react";
+import { Image, Text, View, TextInput, Alert, Keyboard } from "react-native";
 import Authentication_Button from "../../Custom/AuthenticationButton";
 import { SocialIcon } from "react-native-elements";
 import { Container, Content } from "native-base";
@@ -10,6 +10,13 @@ import { auth, db } from "../../../firebase/firebaseConfig";
 import firestore from "@react-native-firebase/firestore";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scrollview";
 import I18n from "../../../localization/utils/language";
+import { useDispatch } from "react-redux";
+import {
+  setUserFname,
+  setUserLname,
+  setUserEmail,
+} from "../../../slices/userInfoSlice";
+import TNActivityIndicator from "../../Custom/TNActivityIndicator/TNActivityIndicator";
 
 const signupSchema = yup.object({
   fname: yup.string().required("First Name cannot be empty"),
@@ -26,9 +33,12 @@ const signupSchema = yup.object({
 
 const Signup = (props) => {
   const styles = dynamic_styles();
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
 
   const signup = async (values, actions) => {
     console.log("Signup");
+    setLoading(true);
     auth
       .createUserWithEmailAndPassword(values.email, values.pass)
       .then((authUser) => {
@@ -45,16 +55,33 @@ const Signup = (props) => {
             password: values.pass,
             fname: values.fname,
             lname: values.lname,
-            //photoUrl: photoUrl,
             createdAt: firestore.FieldValue.serverTimestamp(),
           })
-          .then(() => {
-            console.log("User added!");
+          .then((user) => {
+            console.log("User added!", user);
+
             //Alert.alert("User added!", "User account created & signed in!");
             //props.navigation.replace("Home");
           });
+
+        if (authUser.user.fname) {
+          dispatch(setUserFname(authUser.user.fname));
+        }
+        if (authUser.user.lname) {
+          dispatch(setUserLname(authUser.user.lname));
+        }
+        if (authUser.user.email) {
+          dispatch(setUserEmail(authUser.user.email));
+        }
+
+        Keyboard.dismiss();
+        props.navigation.reset({
+          index: 0,
+          routes: [{ name: "MapStack", params: { user: authUser.user } }],
+        });
       })
       .catch((error) => {
+        setLoading(false);
         if (error.code === "auth/email-already-in-use") {
           console.log("That email address is already in use!");
         }
@@ -176,6 +203,7 @@ const Signup = (props) => {
           </View>
         </Content>
       </Container>
+      {loading && <TNActivityIndicator />}
     </KeyboardAwareScrollView>
   );
 };

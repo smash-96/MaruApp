@@ -1,4 +1,3 @@
-//import AsyncStorage from "@react-native-community/async-storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 const SHOULD_SHOW_ONBOARDING_FLOW = "SHOULD_SHOW_ONBOARDING_FLOW";
 
@@ -16,6 +15,15 @@ const getShouldShowOnboardingFlow = async () => {
     console.log(err);
   }
 };
+const getAppLanguage = async () => {
+  try {
+    const result = await AsyncStorage.getItem("language");
+
+    return result;
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 /**
  * Get Should Show OnBoarding Flow
@@ -29,10 +37,19 @@ const setShouldShowOnboardingFlow = async (value) => {
     console.log(err);
   }
 };
+const setAppLanguage = async (value) => {
+  try {
+    await AsyncStorage.setItem("language", value);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 const authDeviceStorage = {
   getShouldShowOnboardingFlow,
+  getAppLanguage,
   setShouldShowOnboardingFlow,
+  setAppLanguage,
 };
 
 export default authDeviceStorage;

@@ -41,20 +41,20 @@ const defaultProfilePhotoURL =
 //   });
 // };
 
-// const loginWithEmailAndPassword = (email, password) => {
-//   return new Promise(function (resolve, _reject) {
-//     authAPI.loginWithEmailAndPassword(email, password).then((response) => {
-//       if (!response.error) {
-//         handleSuccessfulLogin({ ...response.user }, false).then((res) => {
-//           // Login successful, push token stored, login credential persisted, so we log the user in.
-//           resolve({ user: res.user });
-//         });
-//       } else {
-//         resolve({ error: response.error });
-//       }
-//     });
-//   });
-// };
+const loginWithEmailAndPassword = (email, password) => {
+  return new Promise(function (resolve, _reject) {
+    authAPI.loginWithEmailAndPassword(email, password).then((response) => {
+      if (!response.error) {
+        handleSuccessfulLogin({ ...response.user }, false).then((res) => {
+          // Login successful, push token stored, login credential persisted, so we log the user in.
+          resolve({ user: res.user });
+        });
+      } else {
+        resolve({ error: response.error });
+      }
+    });
+  });
+};
 
 // const onVerification = (phone) => {
 //   authAPI.onVerificationChanged(phone);
@@ -460,6 +460,7 @@ const getCurrentLocation = (geolocation) => {
 };
 
 const authManager = {
+  loginWithEmailAndPassword,
   retrievePersistedAuthUser,
 };
 

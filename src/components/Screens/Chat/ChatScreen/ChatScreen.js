@@ -109,61 +109,61 @@ const ChatScreen = (props) => {
     });
   };
 
-  // Listener for audio/video calls
-  useEffect(() => {
-    const unsubscribe = db.collection("Users").onSnapshot((snapshot) => {
-      snapshot.forEach((user) => {
-        const chatID = () => {
-          const chatterID = auth?.currentUser?.uid;
-          const chateeID = user.data().uid;
-          const chatIDpre = [];
-          chatIDpre.push(chatterID);
-          chatIDpre.push(chateeID);
-          chatIDpre.sort();
-          return chatIDpre.join("_");
-        };
+  // // Listener for audio/video calls
+  // useEffect(() => {
+  //   const unsubscribe = db.collection("Users").onSnapshot((snapshot) => {
+  //     snapshot.forEach((user) => {
+  //       const chatID = () => {
+  //         const chatterID = auth?.currentUser?.uid;
+  //         const chateeID = user.data().uid;
+  //         const chatIDpre = [];
+  //         chatIDpre.push(chatterID);
+  //         chatIDpre.push(chateeID);
+  //         chatIDpre.sort();
+  //         return chatIDpre.join("_");
+  //       };
 
-        const cRef = db.collection("meet").doc(chatID());
+  //       const cRef = db.collection("meet").doc(chatID());
 
-        cRef.onSnapshot(async (snapshot) => {
-          const data = snapshot.data();
+  //       cRef.onSnapshot(async (snapshot) => {
+  //         const data = snapshot.data();
 
-          // If there is offer for chatId, set the getting call flag
-          if (
-            data &&
-            data.offer &&
-            !connecting &&
-            data.chatType === "video" &&
-            (
-              await db.collection("Users").doc(auth?.currentUser?.uid).get()
-            ).data()?.connection !== "close"
-          ) {
-            //
-            db.collection("Users")
-              .doc(auth?.currentUser?.uid)
-              .update({ connection: "close" });
-            //
+  //         // If there is offer for chatId, set the getting call flag
+  //         if (
+  //           data &&
+  //           data.offer &&
+  //           !connecting &&
+  //           data.chatType === "video" &&
+  //           (
+  //             await db.collection("Users").doc(auth?.currentUser?.uid).get()
+  //           ).data()?.connection !== "close"
+  //         ) {
+  //           //
+  //           db.collection("Users")
+  //             .doc(auth?.currentUser?.uid)
+  //             .update({ connection: "close" });
+  //           //
 
-            navigation.navigate("VideoChat", {
-              callee: auth?.currentUser?.uid,
-              caller: user.data().uid,
-              photo: user.data().photoUrl,
-            });
-          }
+  //           navigation.navigate("VideoChat", {
+  //             callee: auth?.currentUser?.uid,
+  //             caller: user.data().uid,
+  //             photo: user.data().photoUrl,
+  //           });
+  //         }
 
-          if (data && data.offer && !connecting && data.chatType === "audio") {
-            navigation.navigate("AudioChat", {
-              callee: auth?.currentUser?.uid,
-              caller: user.data().uid,
-              photo: user.data().photoUrl,
-            });
-          }
-        });
-      });
-    });
+  //         if (data && data.offer && !connecting && data.chatType === "audio") {
+  //           navigation.navigate("AudioChat", {
+  //             callee: auth?.currentUser?.uid,
+  //             caller: user.data().uid,
+  //             photo: user.data().photoUrl,
+  //           });
+  //         }
+  //       });
+  //     });
+  //   });
 
-    return unsubscribe;
-  }, []);
+  //   return unsubscribe;
+  // }, []);
 
   return (
     <SafeAreaProvider style={{ backgroundColor: "#effdff" }}>

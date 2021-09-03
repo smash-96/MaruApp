@@ -21,6 +21,7 @@ const SelectLanguage = (props) => {
           console.log("English");
           setLocale("en");
           deviceStorage.setShouldShowOnboardingFlow("false");
+          deviceStorage.setAppLanguage("en");
           props.navigation.replace("Login");
         }}
       />
@@ -31,6 +32,7 @@ const SelectLanguage = (props) => {
           console.log("Japanese");
           setLocale("jp");
           deviceStorage.setShouldShowOnboardingFlow("false");
+          deviceStorage.setAppLanguage("jp");
           props.navigation.replace("Login");
         }}
       />

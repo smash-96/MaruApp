@@ -29,6 +29,7 @@ import {
   setUserGender,
   setUserAge,
 } from "../../../slices/userInfoSlice";
+import { setUserData, selectUserData } from "../../../slices/userAuthSlice";
 
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -84,13 +85,11 @@ const Login = (props) => {
       .then((response) => {
         if (response?.user) {
           const user = response.user;
+          delete user["createdAt"];
+          delete user["lastOnlineTimestamp"];
           //console.log("USER_NEW", user);
-          // dispatch(
-          //   setUserData({
-          //     user: response.user,
-          //   })
-          // );
-          //
+          dispatch(setUserData({ user }));
+
           if (user.photoUrl) {
             dispatch(setUserPhoto(user.photoUrl));
           }
@@ -184,6 +183,10 @@ const Login = (props) => {
       .then((response) => {
         if (response?.user) {
           const user = response.user;
+          delete user["createdAt"];
+          delete user["lastOnlineTimestamp"];
+          //console.log("USER_NEW", user);
+          dispatch(setUserData({ user }));
           //
           if (user.photoUrl) {
             dispatch(setUserPhoto(user.photoUrl));

@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useRef } from "react";
+import React, { useState, useLayoutEffect, useRef, useEffect } from "react";
 import { Avatar } from "react-native-elements";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import dynamic_styles from "./styles";
@@ -17,23 +17,20 @@ import {
 } from "react-native";
 import { auth, db } from "../../../../firebase/firebaseConfig";
 import firestore from "@react-native-firebase/firestore";
-// import {VideoChat} from '../Custom/VideoChat';
-// import {AudioChat} from '../Custom/AudioChat';
-// import {toggleCall} from '../../redux/actions/call';
-// import {useDispatch, useSelector} from 'react-redux';
+import { initiateAVCall } from "../../../avchat";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
+import { selectUserData } from "../../../../slices/userAuthSlice";
 
 const ConvoScreen = (props) => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const styles = dynamic_styles();
+  const currentUser = useSelector(selectUserData);
 
   const [msg, setMsg] = useState("");
   const [messages, setMessages] = useState([]);
-  const scrollViewRef = useRef();
-
-  //   // maps the component state to redux state
-  //   const connecting = useSelector(state => state.callReducer.connecting);
-  //   //
+  const [channel, setChannel] = useState([]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -110,21 +107,44 @@ const ConvoScreen = (props) => {
   // For Caller
   const videoCall = () => {
     console.log("Video Call");
-    props.navigation.navigate("VideoChat", {
-      callType: "video",
-      caller: auth?.currentUser?.uid,
-      callee: props.route.params.uid,
-    });
+    // props.navigation.navigate("VideoChat", {
+    //   callType: "video",
+    //   caller: auth?.currentUser?.uid,
+    //   callee: props.route.params.uid,
+    // });
+
+    initiateAVCall(
+      {
+        participants: {
+          caller: auth?.currentUser?.uid,
+          callee: props.route.params.uid,
+        },
+      },
+      "video",
+      currentUser,
+      dispatch
+    );
   };
 
   // For Caller
   const audioCall = () => {
     console.log("Audio Call");
-    props.navigation.navigate("AudioChat", {
-      callType: "audio",
-      caller: auth?.currentUser?.uid,
-      callee: props.route.params.uid,
-    });
+    // props.navigation.navigate("AudioChat", {
+    //   callType: "audio",
+    //   caller: auth?.currentUser?.uid,
+    //   callee: props.route.params.uid,
+    // });
+    initiateAVCall(
+      {
+        participants: [
+          { uid: auth?.currentUser?.uid },
+          { uid: props.route.params.uid },
+        ],
+      },
+      "audio",
+      currentUser.user,
+      dispatch
+    );
   };
 
   const chatID = () => {

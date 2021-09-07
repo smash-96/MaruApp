@@ -186,7 +186,7 @@ const IMAVActiveVideoCallView = (props) => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.controlIconContainer, { backgroundColor: "#fc2e50" }]}
+          style={[styles.controlIconContainer, { backgroundColor: "red" }]}
           onPress={onCallExit}
         >
           <Image source={assets.endCallIcon} style={styles.imageIcon} />

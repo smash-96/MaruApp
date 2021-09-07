@@ -128,7 +128,7 @@ const ProfileScreen = (props) => {
       headerTitleStyle: { color: "white" },
       headerLeft: () => (
         <View style={{ marginLeft: 20 }}>
-          {checkProfileComplete() === true ? (
+          {checkProfileComplete() !== true ? (
             <TouchableOpacity
               onPress={() => navigation.toggleDrawer()}
               activeOpacity={0.5}

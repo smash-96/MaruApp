@@ -85,8 +85,8 @@ const Login = (props) => {
       .then((response) => {
         if (response?.user) {
           const user = response.user;
-          delete user["createdAt"];
-          delete user["lastOnlineTimestamp"];
+          // delete user["createdAt"];
+          // delete user["lastOnlineTimestamp"];
           //console.log("USER_NEW", user);
           dispatch(setUserData({ user }));
 
@@ -183,8 +183,8 @@ const Login = (props) => {
       .then((response) => {
         if (response?.user) {
           const user = response.user;
-          delete user["createdAt"];
-          delete user["lastOnlineTimestamp"];
+          // delete user["createdAt"];
+          // delete user["lastOnlineTimestamp"];
           //console.log("USER_NEW", user);
           dispatch(setUserData({ user }));
           //

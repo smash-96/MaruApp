@@ -64,7 +64,6 @@ export default class AVTracker {
 
     // If we were not able to find any valid call where the user is already involved in, we look for the incoming calls
     const incomingCalls = allCalls.filter((call) => call.status === "incoming");
-    console.log("incomingCalls.length", incomingCalls.length);
     for (var i = 0; i < incomingCalls.length; ++i) {
       const currentCall = incomingCalls[i];
       const callChannel = await this.apiManager.retrieveCallChannel(

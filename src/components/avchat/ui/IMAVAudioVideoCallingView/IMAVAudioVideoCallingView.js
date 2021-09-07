@@ -13,6 +13,7 @@ const assets = {
   microphoneIcon: require("../../assets/microphone.png"),
   mutedMicrophoneIcon: require("../../assets/muted-mic-icon.png"),
   speakerIcon: require("../../assets/speaker.png"),
+  backgroudImage: require("../../assets/splashscreen_image.png"),
 };
 
 const IMAVAudioVideoCallingView = (props) => {
@@ -34,8 +35,8 @@ const IMAVAudioVideoCallingView = (props) => {
   const title =
     channelTitle?.length > 0
       ? channelTitle
-      : `${otherParticipants[0]?.firstName ?? ""} ${
-          otherParticipants[0]?.lastName ?? ""
+      : `${otherParticipants[0]?.fname ?? ""} ${
+          otherParticipants[0]?.lname ?? ""
         }`;
 
   useEffect(() => {
@@ -75,7 +76,11 @@ const IMAVAudioVideoCallingView = (props) => {
           ]}
         >
           <Image
-            source={{ uri: user.profilePictureURL }}
+            source={{
+              uri:
+                user.photoUrl ||
+                "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg",
+            }}
             style={styles.profilePicture}
           />
         </View>
@@ -87,21 +92,22 @@ const IMAVAudioVideoCallingView = (props) => {
   return (
     <Image
       blurRadius={20}
-      source={{
-        uri:
-          otherParticipants[0]?.profilePictureURL ||
-          "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg",
-      }}
+      // source={{
+      //   uri:
+      //     otherParticipants[0]?.photoUrl ||
+      //     "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg",
+      // }}
+      source={assets.backgroudImage}
       style={styles.imageBackground}
     >
       <BlurView tint={"dark"} intensity={100} style={StyleSheet.absoluteFill} />
       <View style={styles.container}>
         <View style={styles.profileContainer}>
-          {/* <View style={styles.avatarContainer}>
+          <View style={styles.avatarContainer}>
             {otherParticipants.map((user, index) =>
-              renderUserAvatar(user, index),
+              renderUserAvatar(user, index)
             )}
-          </View> */}
+          </View>
 
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.callStatusLabelTitle}>
@@ -137,10 +143,7 @@ const IMAVAudioVideoCallingView = (props) => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[
-              styles.controlIconContainer,
-              { backgroundColor: "#fc2e50" },
-            ]}
+            style={[styles.controlIconContainer, { backgroundColor: "red" }]}
             onPress={onRejectCall}
           >
             <Image source={assets.endCallIcon} style={styles.imageIcon} />
@@ -149,7 +152,7 @@ const IMAVAudioVideoCallingView = (props) => {
             <TouchableOpacity
               style={[
                 styles.controlIconContainer,
-                { backgroundColor: "#6abd6e" },
+                { backgroundColor: "green" },
               ]}
               onPress={onAcceptCall}
             >

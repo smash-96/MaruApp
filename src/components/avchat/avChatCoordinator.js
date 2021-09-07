@@ -21,7 +21,7 @@ export default class AVChatCoordinator {
     );
     //const participants = channel.participants;
     const callID = uuid.v4();
-    const callTitle = channel.name ?? channel.title ?? "Random Call Title";
+    const callTitle = channel.name ?? channel.title ?? "";
 
     // We first set the active call data on the current redux state, so the calling screens will show up automatically on the initiator device
     const activeCallData = {

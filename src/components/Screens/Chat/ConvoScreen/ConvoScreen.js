@@ -117,7 +117,12 @@ const ConvoScreen = (props) => {
       {
         participants: [
           { uid: auth?.currentUser?.uid },
-          { uid: props.route.params.uid },
+          {
+            uid: props.route.params.uid,
+            photoUrl: props.route.params.photo,
+            fname: props.route.params.fname,
+            lname: props.route.params.lname,
+          },
         ],
       },
       "video",
@@ -138,7 +143,12 @@ const ConvoScreen = (props) => {
       {
         participants: [
           { uid: auth?.currentUser?.uid },
-          { uid: props.route.params.uid },
+          {
+            uid: props.route.params.uid,
+            photoUrl: props.route.params.photo,
+            fname: props.route.params.fname,
+            lname: props.route.params.lname,
+          },
         ],
       },
       "audio",

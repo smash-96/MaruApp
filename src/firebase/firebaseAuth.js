@@ -433,7 +433,7 @@ export const fetchAndStorePushTokenIfPossible = async (user) => {
     const settings = await messaging().requestPermission();
     if (settings) {
       const token = await messaging().getToken();
-      updateUser(user.id || user.userID, {
+      updateUser(user.uid || user.userID, {
         pushToken: token,
         pushKitToken: "",
         badgeCount: 0,
@@ -446,7 +446,7 @@ export const fetchAndStorePushTokenIfPossible = async (user) => {
 
       VoipPushNotification.addEventListener("register", (token) => {
         console.log("push kit token from ios", token);
-        updateUser(user.id || user.userID, { pushKitToken: token });
+        updateUser(user.uid || user.userID, { pushKitToken: token });
       });
     }
   } catch (error) {

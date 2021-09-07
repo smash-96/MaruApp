@@ -23,7 +23,7 @@ const IMAVActiveVideoCallView = (props) => {
     localStream,
     remoteStreams,
     isTwilioEnabled,
-    twilioVideoTracksMap,
+    //twilioVideoTracksMap,
     isMuted,
     isSpeaker,
     onToggleSpeaker,
@@ -37,12 +37,12 @@ const IMAVActiveVideoCallView = (props) => {
       : []
   ).concat([localStream]);
 
-  const twilioVideoTracksArray = twilioVideoTracksMap
-    ? Array.from(twilioVideoTracksMap, ([trackSid, trackIdentifier]) => ({
-        trackSid: trackSid,
-        trackIdentifier: trackIdentifier,
-      }))
-    : [];
+  // const twilioVideoTracksArray = twilioVideoTracksMap
+  //   ? Array.from(twilioVideoTracksMap, ([trackSid, trackIdentifier]) => ({
+  //       trackSid: trackSid,
+  //       trackIdentifier: trackIdentifier,
+  //     }))
+  //   : [];
 
   const [fullscreenStreamIndex, setFullscreenStreamIndex] = useState(0);
 

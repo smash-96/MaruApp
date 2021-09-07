@@ -22,7 +22,6 @@ export default class AVTracker {
 
   onActiveCallsUpdate = async (allCalls) => {
     this.allCalls = allCalls;
-    console.log("activeCalls", allCalls);
     this.updateCallUXIfNeeded();
   };
 
@@ -30,7 +29,6 @@ export default class AVTracker {
     // If user instantiated the call in this app session, we want to maintain the button states for speaker and microphone
     const state = this.reduxStore.getState();
     const activeCallData = state.calls?.activeCallData;
-    console.log("activeCallData", activeCallData);
     const controlsState = activeCallData?.controlsState ?? {
       muted: false,
       speaker: false,

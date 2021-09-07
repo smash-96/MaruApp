@@ -54,7 +54,6 @@ const IMAVCallContainerView = (props) => {
   // const [twilioVideoTracks, setTwilioVideoTracks] = useState(new Map());
 
   useEffect(() => {
-    //console.log("currentUser", currentUser?.user);
     if (currentUser?.user.uid) {
       // processLaunchDataIfNeeded();
       // configureCallKeep();
@@ -164,7 +163,6 @@ const IMAVCallContainerView = (props) => {
   };
 
   const onRejectCall = () => {
-    console.log("onRejectCall");
     if (isTwilioEnabled) {
       tearDownTwilioConnections();
     }
@@ -179,7 +177,6 @@ const IMAVCallContainerView = (props) => {
   };
 
   const onCallExit = () => {
-    console.log("onCallExit");
     // The current user was in a call, and they exited it
 
     avChatCoordinator.current.rejectCall(
@@ -318,7 +315,6 @@ const IMAVCallContainerView = (props) => {
     const otherParticipants = allChannelParticipants?.filter(
       (user) => user?.uid !== currentUser?.user.uid
     );
-    console.log("otherParticipants", otherParticipants);
     const callStatusLabelTitle =
       activeCallData.callType == "video"
         ? activeCallData?.status == "incoming"
@@ -368,7 +364,7 @@ const IMAVCallContainerView = (props) => {
           localStream={localStream}
           remoteStreams={remoteStreams}
           isTwilioEnabled={isTwilioEnabled}
-          twilioVideoTracksMap={twilioVideoTracks}
+          //twilioVideoTracksMap={twilioVideoTracks}
           isSpeaker={activeCallData?.controlsState.speaker}
           isMuted={activeCallData?.controlsState.muted}
           onToggleSpeaker={onToggleSpeaker}
@@ -386,7 +382,6 @@ const IMAVCallContainerView = (props) => {
   ) {
     // Audio call already started yet, and current user status is "active" in the call, so we land them directly in the call
     const allChannelParticipants = activeCallData?.allChannelParticipants;
-    console.log("allChannelParticipants", allChannelParticipants);
     const otherParticipants = allChannelParticipants?.filter(
       (user) => user?.uid !== currentUser?.user.uid
     );

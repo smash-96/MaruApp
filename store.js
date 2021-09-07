@@ -9,6 +9,10 @@ export const store = configureStore({
     authUser: authReducer,
     calls: callReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
   // middleware: (getDefaultMiddleware) =>
   //   getDefaultMiddleware({
   //     immutableCheck: { ignoredPaths: ["some.nested.path"] },

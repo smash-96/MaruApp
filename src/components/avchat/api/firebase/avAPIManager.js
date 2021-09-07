@@ -11,7 +11,6 @@ export default class AVAPIManager {
         const activeCall = doc.data();
         activeCalls.push(activeCall);
       });
-      //console.log("activeCalls", activeCalls);
       callback(activeCalls);
     });
   };
@@ -56,7 +55,6 @@ export default class AVAPIManager {
     });
 
     const batch = db.batch();
-    console.log("callParticipants", callParticipants);
     callParticipants.forEach((user) => {
       const ref = db
         .collection("avCallStatuses")
@@ -64,7 +62,7 @@ export default class AVAPIManager {
         .collection("calls")
         .doc(callID);
       batch.set(ref, {
-        status: user.id == currentUser.id ? "outgoing" : "incoming",
+        status: user.uid == currentUser.uid ? "outgoing" : "incoming",
         callType: callType,
         callID: callID,
         allChannelParticipants: callParticipants,
@@ -84,12 +82,11 @@ export default class AVAPIManager {
     }
     const activeParticipants = callChannel.activeParticipants;
     const otherActiveParticipants = activeParticipants?.filter(
-      (participant) => participant.id !== userID
+      (participant) => participant.uid !== userID
     ); // all active participants, but not the current user
-
     const inctiveParticipants = callChannel.allChannelParticipants?.filter(
       (participant) =>
-        activeParticipants?.filter((a) => a.id == participant.id).length == 0
+        activeParticipants?.filter((a) => a.uid == participant.uid).length == 0
     ); // all inactive participants
 
     const allActiveParticipants = [userData].concat(otherActiveParticipants);
@@ -99,10 +96,9 @@ export default class AVAPIManager {
       // Everyone active in the call is signaled to be active (status changes to "active")
       let batch = db.batch();
       allActiveParticipants.forEach((user) => {
-        const ref = firebase
-          .firestore()
+        const ref = db
           .collection("avCallStatuses")
-          .doc(user.id)
+          .doc(user.uid)
           .collection("calls")
           .doc(callID);
 
@@ -120,10 +116,9 @@ export default class AVAPIManager {
 
       // Everyone *inactive* in the group gets updated with the new list of active participants
       inctiveParticipants.forEach((user) => {
-        const ref = firebase
-          .firestore()
+        const ref = db
           .collection("avCallStatuses")
-          .doc(user.id)
+          .doc(user.uid)
           .collection("calls")
           .doc(callID);
         batch.set(
@@ -193,7 +188,6 @@ export default class AVAPIManager {
   };
 
   removeCallData = async (callID, userID) => {
-    console.log("removeCallData");
     const callData = await this.retrieveCallChannel(callID);
 
     let batch = db.batch();
@@ -220,9 +214,7 @@ export default class AVAPIManager {
   removeUserFromCall = async (callID, userID) => {
     console.log("removeUserFromCall " + callID + " user: " + userID);
     // We remove the call channel entry from avCallStatuses for the user
-    firebase
-      .firestore()
-      .collection("avCallStatuses")
+    db.collection("avCallStatuses")
       .doc(userID)
       .collection("calls")
       .doc(callID)
@@ -231,7 +223,7 @@ export default class AVAPIManager {
     // We remove the user from the activeParticipants list of the call channel
     const callChannel = await this.retrieveCallChannel(callID);
     const newActiveParticipants = callChannel?.activeParticipants?.filter(
-      (participant) => participant.id !== userID
+      (participant) => participant.uid !== userID
     );
     if (newActiveParticipants <= 0) {
       // if there's no one left in the call, we simply remove the call entirely
@@ -249,19 +241,16 @@ export default class AVAPIManager {
     }
 
     // if we still have other users in the call, we update the call participant data to exclude the current user
-    firebase
-      .firestore()
-      .collection("avCalls")
+    db.collection("avCalls")
       .doc(callID)
       .set({ activeParticipants: newActiveParticipants }, { merge: true });
 
     // We also propagate the activeParticipants field changes into all the corresponding avCallStatuses
     const batch = db.batch();
     callChannel.allChannelParticipants.forEach((user) => {
-      const ref = firebase
-        .firestore()
+      const ref = db
         .collection("avCallStatuses")
-        .doc(user.id)
+        .doc(user.uid)
         .collection("calls")
         .doc(callID);
       batch.set(
@@ -279,8 +268,7 @@ export default class AVAPIManager {
   // Signaling - connection data (the signals while in a call)
 
   subscribeToCallConnectionData = (callID, userID, callback) => {
-    const callConnectionDataRef = firebase
-      .firestore()
+    const callConnectionDataRef = db
       .collection("avCallConnectionData")
       .doc(callID)
       .collection("connectionData")
@@ -306,8 +294,7 @@ export default class AVAPIManager {
       callID,
       message
   */
-    const callConnectionDataRef = firebase
-      .firestore()
+    const callConnectionDataRef = db
       .collection("avCallConnectionData")
       .doc(callID)
       .collection("connectionData");

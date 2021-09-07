@@ -115,13 +115,13 @@ const ConvoScreen = (props) => {
 
     initiateAVCall(
       {
-        participants: {
-          caller: auth?.currentUser?.uid,
-          callee: props.route.params.uid,
-        },
+        participants: [
+          { uid: auth?.currentUser?.uid },
+          { uid: props.route.params.uid },
+        ],
       },
       "video",
-      currentUser,
+      currentUser.user,
       dispatch
     );
   };

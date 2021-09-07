@@ -20,7 +20,6 @@ export default class AVChatCoordinator {
       channel.participants.filter((u) => u.uid !== currentUser.uid)
     );
     //const participants = channel.participants;
-    console.log("participants", participants);
     const callID = uuid.v4();
     const callTitle = channel.name ?? channel.title ?? "Random Call Title";
 

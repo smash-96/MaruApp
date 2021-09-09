@@ -7,7 +7,10 @@ import * as Location from "expo-location";
 //   AppleAuthRequestScope,
 //   AppleAuthRequestOperation,
 // } from '@invertase/react-native-apple-authentication';
-// import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import {
+  GoogleSignin,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
 // import { IMLocalized } from '../../../../localization/IMLocalization';
 
 const defaultProfilePhotoURL =
@@ -205,42 +208,42 @@ const retrievePersistedAuthUser = () => {
 //   });
 // };
 
-// const loginOrSignUpWithGoogle = (appConfig) => {
-//   GoogleSignin.configure({
-//     webClientId: appConfig.webClientId,
-//   });
-//   return new Promise(async (resolve, _reject) => {
-//     try {
-//       const { idToken } = await GoogleSignin.signIn();
-//       authAPI
-//         .loginWithGoogle(idToken, appConfig.appIdentifier)
-//         .then(async (response) => {
-//           if (response?.user) {
-//             const newResponse = {
-//               user: { ...response.user },
-//               accountCreated: response.accountCreated,
-//             };
-//             handleSuccessfulLogin(
-//               newResponse.user,
-//               response.accountCreated
-//             ).then((response) => {
-//               // resolve(response);
-//               resolve({
-//                 ...response,
-//               });
-//             });
-//           } else {
-//             resolve({ error: ErrorCode.GOOGLE_SIGN_IN_FAILED });
-//           }
-//         });
-//     } catch (error) {
-//       console.log(error);
-//       resolve({
-//         error: ErrorCode.GOOGLE_SIGN_IN_FAILED,
-//       });
-//     }
-//   });
-// };
+const loginOrSignUpWithGoogle = () => {
+  GoogleSignin.configure({
+    webClientId:
+      "804750691319-51kboenh02j1c73cm0qbv46l6umu2ppj.apps.googleusercontent.com",
+  });
+  return new Promise(async (resolve, _reject) => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const { idToken } = await GoogleSignin.signIn();
+      console.log("ERROR HERE!");
+      authAPI.loginWithGoogle(idToken, "com.maruapp").then(async (response) => {
+        if (response?.user) {
+          const newResponse = {
+            user: { ...response.user },
+            accountCreated: response.accountCreated,
+          };
+          handleSuccessfulLogin(newResponse.user, response.accountCreated).then(
+            (response) => {
+              // resolve(response);
+              resolve({
+                ...response,
+              });
+            }
+          );
+        } else {
+          resolve({ error: "ErrorCode.GOOGLE_SIGN_IN_FAILED" });
+        }
+      });
+    } catch (error) {
+      console.log("Developer Error", error);
+      resolve({
+        error: "ErrorCode.GOOGLE_SIGN_IN_FAILED",
+      });
+    }
+  });
+};
 
 // const loginOrSignUpWithFacebook = (appConfig) => {
 //   Facebook.initializeAsync(appConfig.facebookIdentifier);
@@ -469,6 +472,7 @@ const authManager = {
   loginWithEmailAndPassword,
   retrievePersistedAuthUser,
   handleSuccessfulSignup,
+  loginOrSignUpWithGoogle,
 };
 
 export default authManager;

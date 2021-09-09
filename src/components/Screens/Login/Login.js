@@ -161,25 +161,14 @@ const Login = (props) => {
         // }
       }
     });
-    messaging().onMessage((remoteMessage) => {
-      if (remoteMessage && Platform.OS === "ios") {
-        const userID = currentUser?.id || currentUser?.userID;
-        updateUser(userID, { badgeCount: 0 });
-      }
-    });
+    // messaging().onMessage((remoteMessage) => {
+    //   if (remoteMessage && Platform.OS === "ios") {
+    //     const userID = currentUser?.id || currentUser?.userID;
+    //     updateUser(userID, { badgeCount: 0 });
+    //   }
+    // });
   };
   //
-
-  // useEffect(() => {
-  //   const unsubscribe = auth.onAuthStateChanged((authUser) => {
-  //     if (authUser) {
-  //       props.navigation.replace("MapStack");
-  //       console.log(authUser);
-  //     }
-  //   });
-
-  //   return unsubscribe;
-  // }, []);
 
   const login = (values, actions) => {
     console.log("LOGIN");
@@ -244,6 +233,32 @@ const Login = (props) => {
       });
 
     //actions.resetForm();
+  };
+
+  const googleLogin = () => {
+    console.log("Google Signup");
+    setLoading(true);
+    authManager.loginOrSignUpWithGoogle().then((response) => {
+      if (response?.user) {
+        const user = response.user;
+        dispatch(setUserData({ user }));
+        Keyboard.dismiss();
+        props.navigation.reset({
+          index: 0,
+          routes: [
+            {
+              name: "MapStack",
+              //params: { user: user }
+            },
+          ],
+        });
+      } else {
+        setLoading(false);
+        Alert.alert("", response.error, [{ text: "OK" }], {
+          cancelable: false,
+        });
+      }
+    });
   };
 
   const signup = () => {
@@ -338,6 +353,7 @@ const Login = (props) => {
             raised={true}
             type="google"
             style={{ backgroundColor: "#2c88d1" }}
+            onPress={googleLogin}
           />
         </Content>
       </Container>

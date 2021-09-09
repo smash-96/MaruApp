@@ -51,59 +51,60 @@ export const retrievePersistedAuthUser = () => {
 //   auth.sendPasswordResetEmail(email);
 // };
 
-// const signInWithCredential = (authManager, credential, appIdentifier) => {
-//   return new Promise((resolve, _reject) => {
-//     authManager
-//       .auth()
-//       .signInWithCredential(credential)
-//       .then((response) => {
-//         const isNewUser = response.additionalUserInfo.isNewUser;
-//         const { first_name, last_name, family_name, given_name } =
-//           response.additionalUserInfo.profile;
-//         const { uid, email, phoneNumber, photoURL } = response.user;
-//         const defaultProfilePhotoURL =
-//           "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg";
+const signInWithCredential = (authManager, credential, appIdentifier) => {
+  return new Promise((resolve, _reject) => {
+    authManager
+      .auth()
+      .signInWithCredential(credential)
+      .then((response) => {
+        console.log("RESPONSE", response);
+        const isNewUser = response.additionalUserInfo.isNewUser;
+        const { first_name, last_name, family_name, given_name } =
+          response.additionalUserInfo.profile;
+        const { uid, email, phoneNumber, photoURL } = response.user;
+        const defaultProfilePhotoURL =
+          "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg";
 
-//         if (isNewUser) {
-//           const timestamp = firebase.firestore.FieldValue.serverTimestamp();
-//           const userData = {
-//             id: uid,
-//             email: email || "",
-//             firstName: first_name || given_name || "",
-//             lastName: last_name || family_name || "",
-//             phone: phoneNumber || "",
-//             profilePictureURL: photoURL || defaultProfilePhotoURL,
-//             userID: uid,
-//             appIdentifier,
-//             createdAt: timestamp,
-//           };
-//           usersRef
-//             .doc(uid)
-//             .set(userData)
-//             .then(() => {
-//               resolve({
-//                 user: { ...userData, id: uid, userID: uid },
-//                 accountCreated: true,
-//               });
-//             });
-//         }
-//         usersRef
-//           .doc(uid)
-//           .get()
-//           .then((document) => {
-//             const userData = document.data();
-//             resolve({
-//               user: { ...userData, id: uid, userID: uid },
-//               accountCreated: false,
-//             });
-//           });
-//       })
-//       .catch((_error) => {
-//         console.log(_error);
-//         resolve({ error: ErrorCode.serverError });
-//       });
-//   });
-// };
+        if (isNewUser) {
+          //const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+          const userData = {
+            id: uid,
+            email: email || "",
+            firstName: first_name || given_name || "",
+            lastName: last_name || family_name || "",
+            phone: phoneNumber || "",
+            profilePictureURL: photoURL || defaultProfilePhotoURL,
+            userID: uid,
+            appIdentifier,
+            //createdAt: timestamp,
+          };
+          usersRef
+            .doc(uid)
+            .set(userData)
+            .then(() => {
+              resolve({
+                user: { ...userData, id: uid, userID: uid },
+                accountCreated: true,
+              });
+            });
+        }
+        usersRef
+          .doc(uid)
+          .get()
+          .then((document) => {
+            const userData = document.data();
+            resolve({
+              user: { ...userData, id: uid, userID: uid },
+              accountCreated: false,
+            });
+          });
+      })
+      .catch((_error) => {
+        console.log(_error);
+        resolve({ error: "ErrorCode.serverError" });
+      });
+  });
+};
 
 // export const checkUniqueUsername = (username) => {
 //   return new Promise((resolve) => {
@@ -261,17 +262,17 @@ export const loginWithEmailAndPassword = async (email, password) => {
 //   });
 // };
 
-// export const loginWithGoogle = (idToken, appIdentifier) => {
-//   const credential = RNFBAuth.auth.GoogleAuthProvider.credential(idToken);
+export const loginWithGoogle = (idToken, appIdentifier) => {
+  const credential = RNFBAuth.auth.GoogleAuthProvider.credential(idToken);
 
-//   return new Promise((resolve, _reject) => {
-//     signInWithCredential(RNFBAuth, credential, appIdentifier).then(
-//       (response) => {
-//         resolve(response);
-//       }
-//     );
-//   });
-// };
+  return new Promise((resolve, _reject) => {
+    signInWithCredential(RNFBAuth, credential, appIdentifier).then(
+      (response) => {
+        resolve(response);
+      }
+    );
+  });
+};
 
 // export const logout = () => {
 //   firebase.auth().signOut();
@@ -485,6 +486,7 @@ const authAPI = {
   getUserByID,
   updateProfilePhoto,
   updateUser,
+  loginWithGoogle,
 };
 
 export default authAPI;

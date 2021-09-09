@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   StyleSheet,
   View,
@@ -10,38 +10,37 @@ import { auth } from "../../firebase/firebaseConfig";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import * as Location from "expo-location";
+import useLocation from "../Custom/useLocation";
 import Constants from "expo-constants";
 //import tw from "tailwind-react-native-classnames";
 import { useSelector, useDispatch } from "react-redux";
 import {
   setUserLocation,
-  selectUserLocation,
   selectUserType,
-} from "../../slices/userInfoSlice";
-import {
   selectHelpeeLocation,
   selectHelperLocation,
   setHelpeeLocation,
   setHelperLocation,
 } from "../../slices/userInfoSlice";
+import { selectUserData } from "../../slices/userAuthSlice";
 import { GOOGLE_MAPS_APIKEY } from "@env";
 
 const { width, height } = Dimensions.get("window");
 
 const ASPECT_RATIO = width / height;
-const LATITUDE = 31.56192;
-const LONGITUDE = 74.348083;
+const LATITUDE = 31.529279325357457;
+const LONGITUDE = 74.34901334345341;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const DEFAULT_PADDING = { top: 200, right: 40, bottom: 120, left: 40 };
 const userID = auth?.currentUser?.uid;
 
-const Map = () => {
+const Map = (props) => {
   const dispatch = useDispatch();
   const helpeeLocation = useSelector(selectHelpeeLocation);
   const helperLocation = useSelector(selectHelperLocation);
   const userType = useSelector(selectUserType);
-  const userLocation = useSelector(selectUserLocation);
+  const currentUser = useSelector(selectUserData);
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -51,124 +50,115 @@ const Map = () => {
   const mapRef = useRef();
 
   useEffect(() => {
-    const unsubscribe = Location.getCurrentPositionAsync({})
-      .then((location) => {
-        setLatitude(location.coords.latitude);
-        setLongitude(location.coords.longitude);
+    if (helperLocation && helpeeLocation) return;
+
+    if (currentUser?.user?.location) {
+      setLatitude(currentUser.user.location.latitude);
+      setLongitude(currentUser.user.location.longitude);
+
+      console.log("Initial lat long values", latitude, longitude);
+
+      dispatch(
+        setUserLocation({
+          latitude: latitude,
+          longitude: longitude,
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
+        })
+      );
+
+      if (userType === "helper") {
+        //1st corrdinate set for helper
         dispatch(
-          setUserLocation({
+          setHelperLocation({
             latitude: latitude,
             longitude: longitude,
             latitudeDelta: LATITUDE_DELTA,
             longitudeDelta: LONGITUDE_DELTA,
           })
         );
+      } else if (userType === "helpee") {
+        //1st corrdinate set for helpee
+        dispatch(
+          setHelpeeLocation({
+            latitude: latitude,
+            longitude: longitude,
+            latitudeDelta: LATITUDE_DELTA,
+            longitudeDelta: LONGITUDE_DELTA,
+          })
+        );
+      }
 
-        if (userType === "helper") {
-          //1st corrdinate set for helper
-          dispatch(
-            setHelperLocation({
-              latitude: latitude,
-              longitude: longitude,
-              latitudeDelta: LATITUDE_DELTA,
-              longitudeDelta: LONGITUDE_DELTA,
-            })
-          );
-        } else if (userType === "helpee") {
-          //1st corrdinate set for helpee
-          dispatch(
-            setHelpeeLocation({
-              latitude: latitude,
-              longitude: longitude,
-              latitudeDelta: LATITUDE_DELTA,
-              longitudeDelta: LONGITUDE_DELTA,
-            })
-          );
-        }
+      setLoading(false);
+      setErrorMsg(null);
+    } else {
+      console.log("Location fetching error");
+      if (userType === "helper") {
+        //1st corrdinate set for helper in simulator
+        dispatch(
+          setHelperLocation({
+            latitude: LATITUDE,
+            longitude: LONGITUDE,
+            latitudeDelta: LATITUDE_DELTA,
+            longitudeDelta: LONGITUDE_DELTA,
+          })
+        );
+      } else if (userType === "helpee") {
+        //1st corrdinate set for helpee in simulator
+        dispatch(
+          setHelpeeLocation({
+            latitude: LATITUDE,
+            longitude: LONGITUDE,
+            latitudeDelta: LATITUDE_DELTA,
+            longitudeDelta: LONGITUDE_DELTA,
+          })
+        );
+      }
+      //setErrorMsg(err);
+    }
+  }, [loading]);
 
-        setLoading(false);
-        setErrorMsg(null);
-      })
-      .catch((err) => {
-        console.log("Location fetching error", err);
-        if (userType === "helper") {
-          //1st corrdinate set for helper in simulator
-          dispatch(
-            setHelperLocation({
-              latitude: LATITUDE,
-              longitude: LONGITUDE,
-              latitudeDelta: LATITUDE_DELTA,
-              longitudeDelta: LONGITUDE_DELTA,
-            })
-          );
-        } else if (userType === "helpee") {
-          //1st corrdinate set for helpee in simulator
-          dispatch(
-            setHelpeeLocation({
-              latitude: LATITUDE,
-              longitude: LONGITUDE,
-              latitudeDelta: LATITUDE_DELTA,
-              longitudeDelta: LONGITUDE_DELTA,
-            })
-          );
-        }
-        setErrorMsg(err);
-      });
+  const callback = useCallback((location) => {
+    //console.log("CALLBACK LOCATION", location);
+    //dispatch(setHelperLocation(location.coords));
+    setLatitude(location.coords.latitude);
+    setLongitude(location.coords.longitude);
+  }, []);
 
-    return unsubscribe;
-  }, [latitude, longitude, loading]);
+  const [error] = useLocation(props.tracking, callback);
 
   // useEffect(() => {
-  //   try {
-  //     //const { status } = requestPermissionsAsync();
-  //     const subscriber = Location.watchPositionAsync(
-  //       {
-  //         accuracy: Location.Accuracy.High,
-  //       },
-  //       (loc) => setMovingHelperLocation(JSON.parse(JSON.stringify(loc.coords)))
-  //     );
+  //   if (!helperLocation || !helpeeLocation) return;
+  //   // Zoom to fit markers
+  //   // mapRef.current.fitToCoordinates([
+  //   //   {
+  //   //     latitude: helperLocation.latitude,
+  //   //     longitude: helperLocation.longitude,
+  //   //   },
+  //   //   {
+  //   //     latitude: helpeeLocation.latitude,
+  //   //     longitude: helpeeLocation.longitude,
+  //   //   },
+  //   // ]);
+  //   // try {
+  //   //   if (mapRef.current) {
+  //   //     mapRef.current.fitToSuppliedMarkers([
+  //   //       "helperLocation",
+  //   //       "helpeeLocation",
+  //   //     ]);
+  //   //     console.log("fitToSuppliedMarkers");
+  //   //   }
+  //   // } catch (err) {
+  //   //   console.log("Marker Error", err);
+  //   // }
 
-  //     if (status !== "granted") {
-  //       throw new Error("Watching Location permission not granted");
-  //     }
-  //     return subscriber;
-  //   } catch (err) {
-  //     console.log("Watch Positon Error", err);
-  //   }
-  // }, [movingHelperLocation]);
+  //   mapRef.current.fitToSuppliedMarkers(["helperLocation", "helpeeLocation"], {
+  //     edgePadding: DEFAULT_PADDING,
+  //     animated: true,
+  //   });
 
-  useEffect(() => {
-    if (!helperLocation || !helpeeLocation) return;
-    // Zoom to fit markers
-    // mapRef.current.fitToCoordinates([
-    //   {
-    //     latitude: helperLocation.latitude,
-    //     longitude: helperLocation.longitude,
-    //   },
-    //   {
-    //     latitude: helpeeLocation.latitude,
-    //     longitude: helpeeLocation.longitude,
-    //   },
-    // ]);
-    // try {
-    //   if (mapRef.current) {
-    //     mapRef.current.fitToSuppliedMarkers([
-    //       "helperLocation",
-    //       "helpeeLocation",
-    //     ]);
-    //     console.log("fitToSuppliedMarkers");
-    //   }
-    // } catch (err) {
-    //   console.log("Marker Error", err);
-    // }
-
-    mapRef.current.fitToSuppliedMarkers(["helperLocation", "helpeeLocation"], {
-      edgePadding: DEFAULT_PADDING,
-      animated: true,
-    });
-
-    //setZoom(true);
-  }, [helperLocation, helpeeLocation]);
+  //   //setZoom(true);
+  // }, [helperLocation, helpeeLocation]);
 
   // const fitAllMarkers = () => {
   //   try {
@@ -226,9 +216,13 @@ const Map = () => {
         )}
         {helperLocation?.latitude && helperLocation?.longitude && (
           <Marker
+            // coordinate={{
+            //   latitude: simulatedGetMapRegion().latitude,
+            //   longitude: simulatedGetMapRegion().longitude,
+            // }}
             coordinate={{
-              latitude: simulatedGetMapRegion().latitude,
-              longitude: simulatedGetMapRegion().longitude,
+              latitude: helperLocation.latitude,
+              longitude: helperLocation.longitude,
             }}
             title="Helper"
             description={"I am coming to help you!"}
@@ -237,9 +231,13 @@ const Map = () => {
         )}
         {helpeeLocation?.latitude && helpeeLocation?.longitude && (
           <Marker
+            // coordinate={{
+            //   latitude: helpeeLocation.latitude,
+            //   longitude: helpeeLocation.longitude,
+            // }}
             coordinate={{
-              latitude: helpeeLocation.latitude,
-              longitude: helpeeLocation.longitude,
+              latitude: simulatedGetMapRegion().latitude,
+              longitude: simulatedGetMapRegion().longitude,
             }}
             title="Helpee"
             description={"I need help!"}
@@ -272,10 +270,11 @@ const Map = () => {
         )}
         {helperLocation?.latitude && helperLocation?.longitude && (
           <Marker
-            coordinate={{
-              latitude: helperLocation.latitude,
-              longitude: helperLocation.longitude,
-            }}
+            // coordinate={{
+            //   latitude: helperLocation.latitude,
+            //   longitude: helperLocation.longitude,
+            // }}
+            coordinate={getMapRegion()}
             title="Helper"
             description={"I am coming to help you!"}
             identifier="helperLocation"

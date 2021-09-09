@@ -29,7 +29,12 @@ import AVChatCoordinator from "../../avChatCoordinator";
 import IMWebRTCStreamManager from "../../streaming/webRTC/streamManager";
 import IMAVActiveVideoCallView from "../IMAVActiveVideoCallView/IMAVActiveVideoCallView";
 import IMAVActiveAudioCallView from "../IMAVActiveAudioCallView/IMAVActiveAudioCallView";
-import { auth } from "../../../../firebase/firebaseConfig";
+
+// const API_URL =
+//   Platform.OS === "ios" ? "http://localhost:3000" : "http://10.0.2.2:3000";
+
+const API_URL =
+  "https://us-central1-volunteerteam-1c46b.cloudfunctions.net/getNTSToken?data=token";
 
 const IMAVCallContainerView = (props) => {
   const { store } = useContext(ReactReduxContext);
@@ -39,6 +44,7 @@ const IMAVCallContainerView = (props) => {
 
   const [localStream, setLocalStream] = useState(null);
   const [remoteStreams, setRemoteStreams] = useState(null);
+  const [ntsToken, setNTStoken] = useState(null);
 
   const apiManager = useRef(null);
   const avTracker = useRef(null);
@@ -52,6 +58,16 @@ const IMAVCallContainerView = (props) => {
   const isTwilioEnabled = false;
   // const twilioVideoRef = useRef();
   // const [twilioVideoTracks, setTwilioVideoTracks] = useState(new Map());
+
+  useEffect(() => {
+    fetch(`${API_URL}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const value = { iceServers: data.iceServers };
+        console.log("NTS TOKEN", value);
+        setNTStoken(value);
+      });
+  }, []);
 
   useEffect(() => {
     if (currentUser?.user.uid) {
@@ -107,7 +123,6 @@ const IMAVCallContainerView = (props) => {
       !streamManagerConstructorLock.current
     ) {
       streamManagerConstructorLock.current = true;
-
       if (isTwilioEnabled) {
         // The current user just joined the call, so we start a streaming connection
         streamManager.current = new IMTwilioStreamManager(
@@ -132,6 +147,7 @@ const IMAVCallContainerView = (props) => {
               localStream,
               activeCallData?.callType,
               apiManager.current,
+              ntsToken,
               onRemoteStreamsUpdate
             );
             streamManager.current.handleChangesInActiveParticipants(

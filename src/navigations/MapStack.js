@@ -121,7 +121,7 @@ const MapStack = (props) => {
       <Drawer.Screen
         name="ProfileScreen"
         component={ProfileScreen}
-        initialParams={{ user: props.route.params.user }}
+        //initialParams={{ user: props.route.params.user }}
         options={{
           unmountOnBlur: true,
           drawerLabel: ({ focused, size }) => (
@@ -178,7 +178,7 @@ const MapStack = (props) => {
         }}
       />
 
-      <Drawer.Screen
+      {/* <Drawer.Screen
         name="SettingScreen"
         component={SettingScreen}
         options={{
@@ -196,7 +196,7 @@ const MapStack = (props) => {
             />
           ),
         }}
-      />
+      /> */}
     </Drawer.Navigator>
   );
 };

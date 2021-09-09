@@ -1,7 +1,6 @@
-import { auth, db } from "../../../../firebase/firebaseConfig";
+import { db } from "../../../../firebase/firebaseConfig";
 
 // Readers and listeners from the signaling server
-
 export default class AVAPIManager {
   subscribeToAVCallStatuses = (userID, callback) => {
     const ref = db.collection("avCallStatuses").doc(userID).collection("calls");

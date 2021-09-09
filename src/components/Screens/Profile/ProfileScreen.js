@@ -41,7 +41,6 @@ import Picker from "../../Custom/Picker";
 import { Icon } from "react-native-elements";
 
 const ProfileScreen = (props) => {
-  //console.log("PROPS_USER_INFO_?", props.route.params.user);
   const navigation = useNavigation();
   const styles = dynamic_styles();
   const dispatch = useDispatch();
@@ -128,7 +127,7 @@ const ProfileScreen = (props) => {
       headerTitleStyle: { color: "white" },
       headerLeft: () => (
         <View style={{ marginLeft: 20 }}>
-          {checkProfileComplete() !== true ? (
+          {checkProfileComplete() === true ? (
             <TouchableOpacity
               onPress={() => navigation.toggleDrawer()}
               activeOpacity={0.5}

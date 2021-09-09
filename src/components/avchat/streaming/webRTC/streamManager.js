@@ -27,6 +27,7 @@ export default class IMWebRTCStreamManager {
     localStream,
     callType,
     apiManager,
+    ntsToken,
     onRemoteStreamsUpdateCallback
   ) {
     this.userID = userID;
@@ -34,6 +35,7 @@ export default class IMWebRTCStreamManager {
     this.localStream = localStream;
     this.callType = callType;
     this.apiManager = apiManager;
+    this.ntsToken = ntsToken;
     this.onRemoteStreamsUpdateCallback = onRemoteStreamsUpdateCallback;
 
     // Subscribe user to call connection data updates for this channel, but we make sure we created a local stream first
@@ -257,7 +259,7 @@ export default class IMWebRTCStreamManager {
       if (this.peerConnections[recipientID]) {
         return this.peerConnections[recipientID];
       }
-      const pc = new RTCPeerConnection(servers);
+      const pc = new RTCPeerConnection(this.ntsToken);
       pc.addStream(this.localStream);
 
       pc.onconnectionstatechange = (event) => {

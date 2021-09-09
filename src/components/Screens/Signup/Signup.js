@@ -10,6 +10,7 @@ import { auth, db } from "../../../firebase/firebaseConfig";
 import firestore from "@react-native-firebase/firestore";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scrollview";
 import I18n from "../../../localization/utils/language";
+import authManager from "../../Utils/AuthManager";
 import { useDispatch } from "react-redux";
 import {
   setUserFname,
@@ -55,29 +56,33 @@ const Signup = (props) => {
             password: values.pass,
             fname: values.fname,
             lname: values.lname,
-            createdAt: firestore.FieldValue.serverTimestamp(),
+            //createdAt: firestore.FieldValue.serverTimestamp(),
           })
-          .then((user) => {
-            console.log("User added!", user);
+          .then(() => {
+            console.log("User added!");
 
             //Alert.alert("User added!", "User account created & signed in!");
             //props.navigation.replace("Home");
           });
 
-        if (authUser.user.fname) {
-          dispatch(setUserFname(authUser.user.fname));
-        }
-        if (authUser.user.lname) {
-          dispatch(setUserLname(authUser.user.lname));
-        }
-        if (authUser.user.email) {
-          dispatch(setUserEmail(authUser.user.email));
-        }
+        authManager.handleSuccessfulSignup(authUser.user, true).then((res) => {
+          if (res?.user) {
+            //const user = res.user;
+            dispatch(setUserFname(values.fname));
+            dispatch(setUserLname(values.lname));
+            dispatch(setUserEmail(values.email));
 
-        Keyboard.dismiss();
-        props.navigation.reset({
-          index: 0,
-          routes: [{ name: "MapStack", params: { user: authUser.user } }],
+            Keyboard.dismiss();
+            props.navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: "MapStack",
+                  //params: { user: authUser.user }
+                },
+              ],
+            });
+          }
         });
       })
       .catch((error) => {

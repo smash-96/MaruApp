@@ -446,6 +446,7 @@ export const fetchAndStorePushTokenIfPossible = async (user) => {
 
       VoipPushNotification.addEventListener("register", (token) => {
         console.log("push kit token from ios", token);
+
         updateUser(user.uid || user.userID, { pushKitToken: token });
       });
     }
@@ -457,7 +458,7 @@ export const fetchAndStorePushTokenIfPossible = async (user) => {
 export const updateUser = async (userID, newData) => {
   const dataWithOnlineStatus = {
     ...newData,
-    lastOnlineTimestamp: firestore.FieldValue.serverTimestamp(),
+    //lastOnlineTimestamp: firestore.FieldValue.serverTimestamp(), // Turn on when implementing "last seen & typinf indicators" etc
   };
   return await usersRef
     .doc(userID)

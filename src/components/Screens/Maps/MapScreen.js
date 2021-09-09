@@ -36,8 +36,8 @@ import haversine from "haversine";
 const { width, height } = Dimensions.get("window");
 
 const ASPECT_RATIO = width / height;
-const LATITUDE = 31.56192;
-const LONGITUDE = 74.348083;
+const LATITUDE = 31.529279325357457;
+const LONGITUDE = 74.34901334345341;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const DEFAULT_PADDING = { top: 40, right: 40, bottom: 120, left: 40 };
@@ -55,8 +55,8 @@ const MapScreen = () => {
   const [helpeeModalOpen, setHelpeeModalOpen] = useState(false);
   const [helperModalOpen, setHelperModalOpen] = useState(false);
 
-  const [helpeeInfoIndicator, setHelpeeInfoIndicator] = useState(false);
-  const [helperInfoIndicator, setHelperInfoIndicator] = useState(false);
+  const [tracking, setTracking] = useState(false);
+
   const [helperModalData, setHelperModalData] = useState(null);
 
   const navigation = useNavigation();
@@ -121,8 +121,8 @@ const MapScreen = () => {
       subject: request.subject || "NA",
       details: request.details || "NA",
       status: "open",
-      locationHelpee: userLocation,
-      //locationHelpee: simulatedGetMapRegion(),
+      //locationHelpee: helpeeLocation,
+      locationHelpee: simulatedGetMapRegion(),
       ttl: request.time || "NA", // How soon does the helpee need help. E.g: within an hour
       timeStamp: firestore.FieldValue.serverTimestamp(),
     });
@@ -161,14 +161,14 @@ const MapScreen = () => {
           if (tempDoc.length !== 0) {
             for (let i = 0; i < tempDoc.length; i++) {
               if (tempDoc[i].status === "open") {
-                const start = {
-                  latitude: simulatedGetMapRegion().latitude,
-                  longitude: simulatedGetMapRegion().longitude,
-                };
                 // const start = {
-                //   latitude: userLocation.latitude,
-                //   longitude: userLocation.longitude,
+                //   latitude: simulatedGetMapRegion().latitude,
+                //   longitude: simulatedGetMapRegion().longitude,
                 // };
+                const start = {
+                  latitude: helperLocation.latitude,
+                  longitude: helperLocation.longitude,
+                };
 
                 const end = {
                   latitude: tempDoc[i].locationHelpee.latitude,
@@ -214,6 +214,9 @@ const MapScreen = () => {
 
       // set for helper
       clearRequest();
+
+      // await new Promise((resolve) => setTimeout(resolve, 2000));
+      // setTracking(false);
     }
   };
 
@@ -226,8 +229,8 @@ const MapScreen = () => {
       requests.doc(helperModalData.id).update({
         helperID: auth?.currentUser?.uid,
         status: "InProgress",
-        //locationHelper: userLocation,
-        locationHelper: simulatedGetMapRegion(),
+        locationHelper: helperLocation,
+        //locationHelper: simulatedGetMapRegion(),
       });
       setT_id(helperModalData.helpeeID); // set helpee ID for helper to delete
       accept(helperModalData);
@@ -252,6 +255,7 @@ const MapScreen = () => {
         longitudeDelta: LONGITUDE_DELTA,
       })
     );
+
     // Alert.alert(
     //   "Request Accepted",
     //   "You have accepted to help someone in need."
@@ -259,6 +263,8 @@ const MapScreen = () => {
     // set for helper
     setGiveHelp(false);
     setNeedHelp(false);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    setTracking(true);
   };
 
   const clearRequest = async () => {
@@ -362,7 +368,7 @@ const MapScreen = () => {
         <Icon name="menu" />
       </TouchableOpacity>
       <View style={tw`h-full`}>
-        <Map />
+        <Map tracking={tracking} />
       </View>
 
       <View

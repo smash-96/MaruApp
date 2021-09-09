@@ -132,13 +132,14 @@ const ConvoScreen = (props) => {
   };
 
   // For Caller
-  const audioCall = () => {
+  const audioCall = async () => {
     console.log("Audio Call");
     // props.navigation.navigate("AudioChat", {
     //   callType: "audio",
     //   caller: auth?.currentUser?.uid,
     //   callee: props.route.params.uid,
     // });
+
     initiateAVCall(
       {
         participants: [

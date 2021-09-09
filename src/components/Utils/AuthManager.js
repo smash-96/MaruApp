@@ -1,6 +1,6 @@
 import authAPI from "../../firebase/firebaseAuth";
 //import { ErrorCode } from "../../ErrorCode";
-import Geolocation from "@react-native-community/geolocation";
+//import Geolocation from "@react-native-community/geolocation";
 // import * as Facebook from 'expo-facebook';
 import * as Location from "expo-location";
 // import appleAuth, {
@@ -387,6 +387,13 @@ const retrievePersistedAuthUser = () => {
 //   });
 // };
 
+const handleSuccessfulSignup = (user, accountCreated) => {
+  return new Promise(function (resolve, _reject) {
+    handleSuccessfulLogin(user, accountCreated).then((response) => {
+      resolve(response);
+    });
+  });
+};
 const handleSuccessfulLogin = (user, accountCreated) => {
   // After a successful login, we fetch & store the device token for push notifications, location, online status, etc.
   // we don't wait for fetching & updating the location or push token, for performance reasons (especially on Android)
@@ -399,7 +406,7 @@ const handleSuccessfulLogin = (user, accountCreated) => {
 const fetchAndStoreExtraInfoUponLogin = async (user, accountCreated) => {
   authAPI.fetchAndStorePushTokenIfPossible(user);
 
-  getCurrentLocation(Geolocation).then(async (location) => {
+  getCurrentLocation().then(async (location) => {
     const latitude = location.coords.latitude;
     const longitude = location.coords.longitude;
     var locationData = {};
@@ -426,11 +433,11 @@ const fetchAndStoreExtraInfoUponLogin = async (user, accountCreated) => {
       isOnline: true,
     };
 
-    authAPI.updateUser(user.id || user.userID, userData);
+    authAPI.updateUser(user.uid || user.userID, userData);
   });
 };
 
-const getCurrentLocation = (geolocation) => {
+const getCurrentLocation = () => {
   return new Promise(async (resolve) => {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
@@ -438,13 +445,12 @@ const getCurrentLocation = (geolocation) => {
       return;
     }
 
-    geolocation.getCurrentPosition(
+    await Location.getCurrentPositionAsync({}).then(
       (location) => {
-        console.log(location);
         resolve(location);
       },
       (error) => {
-        console.log(error);
+        console.log("LOCATION ERROR", error);
       }
     );
 
@@ -462,6 +468,7 @@ const getCurrentLocation = (geolocation) => {
 const authManager = {
   loginWithEmailAndPassword,
   retrievePersistedAuthUser,
+  handleSuccessfulSignup,
 };
 
 export default authManager;

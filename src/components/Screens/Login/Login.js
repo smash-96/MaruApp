@@ -59,7 +59,7 @@ const Login = (props) => {
   }, []);
 
   const handleAppStateChange = async (nextAppState) => {
-    console.log("handleAppStateChange");
+    console.log("handleAppStateChange", nextAppState);
     const intialNotification = await messaging().getInitialNotification();
 
     if (intialNotification && Platform.OS === "android") {
@@ -85,6 +85,7 @@ const Login = (props) => {
       .then((response) => {
         if (response?.user) {
           const user = response.user;
+          // console.log("LOGIN USER", user);
           // delete user["createdAt"];
           // delete user["lastOnlineTimestamp"];
           //console.log("USER_NEW", user);
@@ -124,7 +125,12 @@ const Login = (props) => {
           Keyboard.dismiss();
           props.navigation.reset({
             index: 0,
-            routes: [{ name: "MapStack", params: { user: user } }],
+            routes: [
+              {
+                name: "MapStack",
+                //params: { user: user }
+              },
+            ],
           });
           return;
         }
@@ -222,7 +228,12 @@ const Login = (props) => {
           Keyboard.dismiss();
           props.navigation.reset({
             index: 0,
-            routes: [{ name: "MapStack", params: { user: user } }],
+            routes: [
+              {
+                name: "MapStack",
+                //params: { user: user }
+              },
+            ],
           });
         } else {
           setLoading(false);

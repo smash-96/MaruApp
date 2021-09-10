@@ -32,7 +32,8 @@ export default class AVAPIManager {
     callTitle,
     callType,
     currentUser,
-    callParticipants
+    callParticipants,
+    callee
   ) => {
     /* When a call is started, we write to two Firebase collections:
     1. avCalls - for each call, keep track of the call session metadata (for each call ID, we keep track of the current status of the call)
@@ -67,6 +68,8 @@ export default class AVAPIManager {
         allChannelParticipants: callParticipants,
         activeParticipants: [currentUser],
         initiatedTimestamp,
+        callerID: currentUser.uid,
+        calleeID: callee[0].uid,
       });
     });
 

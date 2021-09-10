@@ -60,15 +60,15 @@ const IMAVCallContainerView = (props) => {
   // const [twilioVideoTracks, setTwilioVideoTracks] = useState(new Map());
 
   useEffect(() => {
-    if (currentUser?.user) {
-      fetch(`${API_URL}`)
-        .then((res) => res.json())
-        .then((data) => {
-          const value = { iceServers: data.iceServers };
-          console.log("NTS TOKEN", value);
-          setNTStoken(value);
-        });
-    }
+    fetch(`${API_URL}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const value = { iceServers: data.iceServers };
+        console.log("NTS TOKEN", value);
+        setNTStoken(value);
+      });
+    // if (currentUser?.user) {
+    // }
   }, []);
 
   useEffect(() => {

@@ -16,6 +16,9 @@ export default class AVChatCoordinator {
     // The current user is starting a new call
 
     // Sometimes the channel does not contain the current user as a participant in the participants field, so we make sure we add it before the call starts, so we have all the participants propagated properly in the signaling process
+    const callee = channel.participants.filter(
+      (u) => u.uid !== currentUser.uid
+    );
     const participants = [currentUser].concat(
       channel.participants.filter((u) => u.uid !== currentUser.uid)
     );
@@ -44,7 +47,8 @@ export default class AVChatCoordinator {
       callTitle,
       callType,
       currentUser,
-      participants
+      participants,
+      callee
     );
 
     // Then, we initiate a push kit notification (iOS) and a push notification (Android)

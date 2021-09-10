@@ -127,38 +127,38 @@ const Map = (props) => {
 
   const [error] = useLocation(props.tracking, callback);
 
-  // useEffect(() => {
-  //   if (!helperLocation || !helpeeLocation) return;
-  //   // Zoom to fit markers
-  //   // mapRef.current.fitToCoordinates([
-  //   //   {
-  //   //     latitude: helperLocation.latitude,
-  //   //     longitude: helperLocation.longitude,
-  //   //   },
-  //   //   {
-  //   //     latitude: helpeeLocation.latitude,
-  //   //     longitude: helpeeLocation.longitude,
-  //   //   },
-  //   // ]);
-  //   // try {
-  //   //   if (mapRef.current) {
-  //   //     mapRef.current.fitToSuppliedMarkers([
-  //   //       "helperLocation",
-  //   //       "helpeeLocation",
-  //   //     ]);
-  //   //     console.log("fitToSuppliedMarkers");
-  //   //   }
-  //   // } catch (err) {
-  //   //   console.log("Marker Error", err);
-  //   // }
+  useEffect(() => {
+    if (!helperLocation || !helpeeLocation) return;
+    // Zoom to fit markers
+    // mapRef.current.fitToCoordinates([
+    //   {
+    //     latitude: helperLocation.latitude,
+    //     longitude: helperLocation.longitude,
+    //   },
+    //   {
+    //     latitude: helpeeLocation.latitude,
+    //     longitude: helpeeLocation.longitude,
+    //   },
+    // ]);
+    // try {
+    //   if (mapRef.current) {
+    //     mapRef.current.fitToSuppliedMarkers([
+    //       "helperLocation",
+    //       "helpeeLocation",
+    //     ]);
+    //     console.log("fitToSuppliedMarkers");
+    //   }
+    // } catch (err) {
+    //   console.log("Marker Error", err);
+    // }
 
-  //   mapRef.current.fitToSuppliedMarkers(["helperLocation", "helpeeLocation"], {
-  //     edgePadding: DEFAULT_PADDING,
-  //     animated: true,
-  //   });
+    mapRef.current.fitToSuppliedMarkers(["helperLocation", "helpeeLocation"], {
+      edgePadding: DEFAULT_PADDING,
+      animated: true,
+    });
 
-  //   //setZoom(true);
-  // }, [helperLocation, helpeeLocation]);
+    //setZoom(true);
+  }, [helperLocation, helpeeLocation]);
 
   // const fitAllMarkers = () => {
   //   try {

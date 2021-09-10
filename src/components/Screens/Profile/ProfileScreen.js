@@ -16,6 +16,7 @@ import { auth, db } from "../../../firebase/firebaseConfig";
 import firestore from "@react-native-firebase/firestore";
 import storage from "@react-native-firebase/storage";
 import dynamic_styles from "./styles";
+import I18n from "../../../localization/utils/language";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setUserType,
@@ -66,14 +67,14 @@ const ProfileScreen = (props) => {
   const [address, setAddress] = useState(null);
   const [age, setAge] = useState(null);
   const options_gender = [
-    <Text style={styles.action_sheet}>Male</Text>,
-    <Text style={styles.action_sheet}>Female</Text>,
-    <Text style={{ fontWeight: "bold" }}>Cancel</Text>,
+    <Text style={styles.action_sheet}>{I18n.t("profile.sheet1.male")}</Text>,
+    <Text style={styles.action_sheet}>{I18n.t("profile.sheet1.female")}</Text>,
+    <Text style={{ fontWeight: "bold" }}>{I18n.t("profile.cancel")}</Text>,
   ];
   const options_type = [
-    <Text style={styles.action_sheet}>helper</Text>,
-    <Text style={styles.action_sheet}>helpee</Text>,
-    <Text style={{ fontWeight: "bold" }}>Cancel</Text>,
+    <Text style={styles.action_sheet}>{I18n.t("profile.sheet2.helper")}</Text>,
+    <Text style={styles.action_sheet}>{I18n.t("profile.sheet2.helpee")}</Text>,
+    <Text style={{ fontWeight: "bold" }}>{I18n.t("profile.cancel")}</Text>,
   ];
   const [gender_placeHolder, set_gender_placeHolder] = useState([
     "Select your gender",
@@ -122,7 +123,7 @@ const ProfileScreen = (props) => {
   }
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: "MARU Profile",
+      title: I18n.t("profile.header"),
       headerStyle: { backgroundColor: "#2c88d1" },
       headerTitleStyle: { color: "white" },
       headerLeft: () => (
@@ -138,8 +139,8 @@ const ProfileScreen = (props) => {
             <TouchableOpacity
               onPress={() => {
                 Alert.alert(
-                  "Profile Incomplete",
-                  "Kindly complete your profile to navigate the app!"
+                  I18n.t("profile.alert2.header"),
+                  I18n.t("profile.alert2.text")
                 );
               }}
               activeOpacity={0.5}
@@ -170,66 +171,66 @@ const ProfileScreen = (props) => {
   }, [navigation]);
 
   // Listener for audio/video calls
-  useEffect(() => {
-    const unsubscribe = db.collection("Users").onSnapshot((snapshot) => {
-      snapshot.forEach((user) => {
-        const chatID = () => {
-          const chatterID = auth?.currentUser?.uid;
-          const chateeID = user.data().uid;
-          const chatIDpre = [];
-          chatIDpre.push(chatterID);
-          chatIDpre.push(chateeID);
-          chatIDpre.sort();
-          return chatIDpre.join("_");
-        };
+  // useEffect(() => {
+  //   const unsubscribe = db.collection("Users").onSnapshot((snapshot) => {
+  //     snapshot.forEach((user) => {
+  //       const chatID = () => {
+  //         const chatterID = auth?.currentUser?.uid;
+  //         const chateeID = user.data().uid;
+  //         const chatIDpre = [];
+  //         chatIDpre.push(chatterID);
+  //         chatIDpre.push(chateeID);
+  //         chatIDpre.sort();
+  //         return chatIDpre.join("_");
+  //       };
 
-        const cRef = db.collection("meet").doc(chatID());
+  //       const cRef = db.collection("meet").doc(chatID());
 
-        cRef.onSnapshot(async (snapshot) => {
-          const data = snapshot.data();
+  //       cRef.onSnapshot(async (snapshot) => {
+  //         const data = snapshot.data();
 
-          // If there is offer for chatId, set the getting call flag
-          if (
-            data &&
-            data.offer &&
-            !connecting &&
-            data.chatType === "video" &&
-            (
-              await db.collection("Users").doc(auth?.currentUser?.uid).get()
-            ).data()?.connection !== "close"
-          ) {
-            //
-            db.collection("Users")
-              .doc(auth?.currentUser?.uid)
-              .update({ connection: "close" });
-            //
+  //         // If there is offer for chatId, set the getting call flag
+  //         if (
+  //           data &&
+  //           data.offer &&
+  //           !connecting &&
+  //           data.chatType === "video" &&
+  //           (
+  //             await db.collection("Users").doc(auth?.currentUser?.uid).get()
+  //           ).data()?.connection !== "close"
+  //         ) {
+  //           //
+  //           db.collection("Users")
+  //             .doc(auth?.currentUser?.uid)
+  //             .update({ connection: "close" });
+  //           //
 
-            navigation.navigate("Messages", {
-              screen: "VideoChat",
-              params: {
-                callee: auth?.currentUser?.uid,
-                caller: user.data().uid,
-                photo: user.data().photoUrl,
-              },
-            });
-          }
+  //           navigation.navigate("Messages", {
+  //             screen: "VideoChat",
+  //             params: {
+  //               callee: auth?.currentUser?.uid,
+  //               caller: user.data().uid,
+  //               photo: user.data().photoUrl,
+  //             },
+  //           });
+  //         }
 
-          if (data && data.offer && !connecting && data.chatType === "audio") {
-            navigation.navigate("Messages", {
-              screen: "AudioChat",
-              params: {
-                callee: auth?.currentUser?.uid,
-                caller: user.data().uid,
-                photo: user.data().photoUrl,
-              },
-            });
-          }
-        });
-      });
-    });
+  //         if (data && data.offer && !connecting && data.chatType === "audio") {
+  //           navigation.navigate("Messages", {
+  //             screen: "AudioChat",
+  //             params: {
+  //               callee: auth?.currentUser?.uid,
+  //               caller: user.data().uid,
+  //               photo: user.data().photoUrl,
+  //             },
+  //           });
+  //         }
+  //       });
+  //     });
+  //   });
 
-    return unsubscribe;
-  }, []);
+  //   return unsubscribe;
+  // }, []);
 
   useEffect(() => {
     if (userPhoto !== null) {
@@ -333,10 +334,7 @@ const ProfileScreen = (props) => {
 
     await new Promise((resolve) => setTimeout(resolve, 2000));
     setUploading(false);
-    Alert.alert(
-      "Profile Updated",
-      "Your profile has been updated with new information!"
-    );
+    Alert.alert(I18n.t("profile.alert1.header"), I18n.t("profile.alert1.text"));
   };
 
   //
@@ -353,7 +351,7 @@ const ProfileScreen = (props) => {
         <View>
           {/* First Name */}
           <View style={styles.singleRow}>
-            <Text style={styles.left_fields}>First Name</Text>
+            <Text style={styles.left_fields}>{I18n.t("profile.fname")}</Text>
 
             <TextInput
               style={styles.fields}
@@ -366,7 +364,7 @@ const ProfileScreen = (props) => {
 
           <View style={styles.singleRow}>
             {/* Last Name */}
-            <Text style={styles.left_fields}>Last Name</Text>
+            <Text style={styles.left_fields}>{I18n.t("profile.lname")}</Text>
 
             <TextInput
               style={styles.fields}
@@ -391,7 +389,7 @@ const ProfileScreen = (props) => {
 
           <View style={styles.singleRow}>
             {/* Address  */}
-            <Text style={styles.left_fields}>Address</Text>
+            <Text style={styles.left_fields}>{I18n.t("profile.address")}</Text>
             {userAddress !== null ? (
               <TextInput
                 style={styles.fields}
@@ -416,18 +414,18 @@ const ProfileScreen = (props) => {
 
           {/* Gender */}
           <View style={styles.singleRow}>
-            <Text style={styles.left_fields}>Gender</Text>
+            <Text style={styles.left_fields}>{I18n.t("profile.gender")}</Text>
 
             <Picker
               myValue={gender}
               getValues={getPickerValues}
               options={options_gender}
-              title={"gender"}
+              title={I18n.t("profile.gender")}
               myplaceholder={gender_placeHolder}
             />
           </View>
           <View style={styles.singleRow}>
-            <Text style={styles.left_fields}>Age</Text>
+            <Text style={styles.left_fields}>{I18n.t("profile.age")}</Text>
 
             {userAge !== null ? (
               <TextInput
@@ -455,12 +453,12 @@ const ProfileScreen = (props) => {
             {/* <TextInput style={styles.fields} placeholder="Your age" /> */}
           </View>
           <View style={styles.singleRow}>
-            <Text style={styles.left_fields}>Select your type</Text>
+            <Text style={styles.left_fields}>{I18n.t("profile.type")}</Text>
             <Picker
               myValue={uType}
               getValues={getPickerValues}
               options={options_type}
-              title={"type"}
+              title={I18n.t("profile.type")}
               myplaceholder={type_placeHolder}
             />
           </View>
@@ -474,7 +472,7 @@ const ProfileScreen = (props) => {
               }}
             >
               {/* <Text>{transferred} % Completed</Text> */}
-              <Text>Updating</Text>
+              <Text>{I18n.t("profile.indicatorText")}</Text>
               <ActivityIndicator size="large" color="#0000ff" />
             </View>
           ) : (
@@ -485,7 +483,7 @@ const ProfileScreen = (props) => {
                 borderRadius: 12,
                 width: "30%",
               }}
-              title="Update"
+              title={I18n.t("profile.button")}
               onPress={submit}
             />
           )}

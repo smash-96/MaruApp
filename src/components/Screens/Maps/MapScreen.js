@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -19,6 +19,7 @@ import HelpForm from "../HelpDetailForm/HelpForm";
 import tw from "tailwind-react-native-classnames";
 import { useNavigation } from "@react-navigation/native";
 import Map from "../../Custom/Map";
+import useLocation from "../../Custom/useLocation";
 import { useSelector, useDispatch } from "react-redux";
 import {
   selectUserType,
@@ -214,9 +215,6 @@ const MapScreen = () => {
 
       // set for helper
       clearRequest();
-
-      // await new Promise((resolve) => setTimeout(resolve, 2000));
-      // setTracking(false);
     }
   };
 
@@ -244,6 +242,29 @@ const MapScreen = () => {
     setHelperModalOpen(false);
   };
 
+  const callback = useCallback(
+    (location) => {
+      console.log("CALLBACK LOCATION", location);
+      dispatch(
+        setHelperLocation({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
+        })
+      );
+      console.log("helperLocation", helperLocation);
+      console.log("TID", t_id);
+
+      db.collection("requests")
+        .doc(t_id)
+        .collection("movingHelper")
+        .doc()
+        .update({ helperLocation });
+    },
+    [t_id, helperLocation]
+  );
+
   const accept = async (reqDoc) => {
     console.log("Request Accepted");
     //2nd corrdinate set for helper
@@ -263,8 +284,10 @@ const MapScreen = () => {
     // set for helper
     setGiveHelp(false);
     setNeedHelp(false);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setTracking(true);
+    //await new Promise((resolve) => setTimeout(resolve, 2000));
+    //setTracking(true);
+
+    //const [error] = useLocation(true, callback);
   };
 
   const clearRequest = async () => {
@@ -280,6 +303,8 @@ const MapScreen = () => {
     }
     setNeedHelp(true);
     setGiveHelp(true);
+    //await new Promise((resolve) => setTimeout(resolve, 2000));
+    //setTracking(false);
   };
 
   const firestoreCleanUp = async () => {
@@ -368,7 +393,7 @@ const MapScreen = () => {
         <Icon name="menu" />
       </TouchableOpacity>
       <View style={tw`h-full`}>
-        <Map tracking={tracking} />
+        <Map tracking={tracking} callback={callback} />
       </View>
 
       <View

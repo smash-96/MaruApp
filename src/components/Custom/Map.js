@@ -56,23 +56,21 @@ const Map = (props) => {
       setLatitude(currentUser.user.location.latitude);
       setLongitude(currentUser.user.location.longitude);
 
-      console.log("Initial lat long values", latitude, longitude);
-
-      dispatch(
-        setUserLocation({
-          latitude: latitude,
-          longitude: longitude,
-          latitudeDelta: LATITUDE_DELTA,
-          longitudeDelta: LONGITUDE_DELTA,
-        })
-      );
+      // dispatch(
+      //   setUserLocation({
+      //     latitude: latitude,
+      //     longitude: longitude,
+      //     latitudeDelta: LATITUDE_DELTA,
+      //     longitudeDelta: LONGITUDE_DELTA,
+      //   })
+      // );
 
       if (userType === "helper") {
         //1st corrdinate set for helper
         dispatch(
           setHelperLocation({
-            latitude: latitude,
-            longitude: longitude,
+            latitude: currentUser.user.location.latitude,
+            longitude: currentUser.user.location.longitude,
             latitudeDelta: LATITUDE_DELTA,
             longitudeDelta: LONGITUDE_DELTA,
           })
@@ -81,14 +79,13 @@ const Map = (props) => {
         //1st corrdinate set for helpee
         dispatch(
           setHelpeeLocation({
-            latitude: latitude,
-            longitude: longitude,
+            latitude: currentUser.user.location.latitude,
+            longitude: currentUser.user.location.longitude,
             latitudeDelta: LATITUDE_DELTA,
             longitudeDelta: LONGITUDE_DELTA,
           })
         );
       }
-
       setLoading(false);
       setErrorMsg(null);
     } else {
@@ -118,14 +115,21 @@ const Map = (props) => {
     }
   }, [loading]);
 
-  const callback = useCallback((location) => {
-    //console.log("CALLBACK LOCATION", location);
-    //dispatch(setHelperLocation(location.coords));
-    setLatitude(location.coords.latitude);
-    setLongitude(location.coords.longitude);
-  }, []);
+  // const callback = useCallback((location) => {
+  //   //console.log("CALLBACK LOCATION", location);
+  //   dispatch(
+  //     setHelperLocation({
+  //       latitude: location.coords.latitude,
+  //       longitude: location.coords.longitude,
+  //       latitudeDelta: LATITUDE_DELTA,
+  //       longitudeDelta: LONGITUDE_DELTA,
+  //     })
+  //   );
+  //   setLatitude(location.coords.latitude);
+  //   setLongitude(location.coords.longitude);
+  // }, []);
 
-  const [error] = useLocation(props.tracking, callback);
+  //const [error] = useLocation(props.tracking, props.callback);
 
   useEffect(() => {
     if (!helperLocation || !helpeeLocation) return;
@@ -182,12 +186,20 @@ const Map = (props) => {
   //   }
   // };
 
-  const getMapRegion = () => ({
-    latitude: latitude,
-    longitude: longitude,
+  const helperMapRegion = () => ({
+    latitude: helperLocation.latitude,
+    longitude: helperLocation.longitude,
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   });
+
+  const helpeeMapRegion = () => ({
+    latitude: helpeeLocation.latitude,
+    longitude: helpeeLocation.longitude,
+    latitudeDelta: LATITUDE_DELTA,
+    longitudeDelta: LONGITUDE_DELTA,
+  });
+
   const simulatedGetMapRegion = () => ({
     latitude: LATITUDE,
     longitude: LONGITUDE,
@@ -256,7 +268,7 @@ const Map = (props) => {
         //provider={PROVIDER_GOOGLE}
         //style={tw`flex-1`}
         style={styles.map}
-        region={getMapRegion()}
+        region={userType === "helper" ? helperMapRegion() : helpeeMapRegion()}
         //showsUserLocation={true}
       >
         {helperLocation && helpeeLocation && (
@@ -274,7 +286,7 @@ const Map = (props) => {
             //   latitude: helperLocation.latitude,
             //   longitude: helperLocation.longitude,
             // }}
-            coordinate={getMapRegion()}
+            coordinate={helperMapRegion()}
             title="Helper"
             description={"I am coming to help you!"}
             identifier="helperLocation"

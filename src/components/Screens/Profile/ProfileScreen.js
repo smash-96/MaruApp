@@ -60,7 +60,7 @@ const ProfileScreen = (props) => {
   const [profilePic, setProfilePic] = useState(baseAvatar || "");
   const [uploading, setUploading] = useState(false);
   const [transferred, setTransferred] = useState(0);
-  const [profileCompleted, setProfileCompleted] = useState(false);
+  const [profileLock, setProfileLock] = useState(true);
 
   const [fname, setFname] = useState(null);
   const [lname, setLname] = useState(null);
@@ -87,7 +87,7 @@ const ProfileScreen = (props) => {
   const [uType, setUType] = useState("");
 
   const getPickerValues = (index, picker_type) => {
-    if (picker_type == "gender") {
+    if (picker_type == "Gender") {
       if (index == 0) {
         setGender("Male");
       } else {
@@ -106,6 +106,10 @@ const ProfileScreen = (props) => {
 
   function checkProfileComplete() {
     if (
+      userFname !== null &&
+      userFname !== "" &&
+      userLname !== null &&
+      userLname !== "" &&
       userAddress !== null &&
       userAddress !== "" &&
       userGender !== null &&
@@ -115,12 +119,16 @@ const ProfileScreen = (props) => {
       userType !== null &&
       userType !== ""
     ) {
-      //setProfileCompleted(true);
       return true;
     }
-    //setProfileCompleted(false);
     return false;
   }
+  // useLayoutEffect(() => {
+  //   if (checkProfileComplete() === true) {
+  //     setProfileLock(false);
+  //   }
+  // }, [profileLock]);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       title: I18n.t("profile.header"),
@@ -168,69 +176,7 @@ const ProfileScreen = (props) => {
         </View>
       ),
     });
-  }, [navigation]);
-
-  // Listener for audio/video calls
-  // useEffect(() => {
-  //   const unsubscribe = db.collection("Users").onSnapshot((snapshot) => {
-  //     snapshot.forEach((user) => {
-  //       const chatID = () => {
-  //         const chatterID = auth?.currentUser?.uid;
-  //         const chateeID = user.data().uid;
-  //         const chatIDpre = [];
-  //         chatIDpre.push(chatterID);
-  //         chatIDpre.push(chateeID);
-  //         chatIDpre.sort();
-  //         return chatIDpre.join("_");
-  //       };
-
-  //       const cRef = db.collection("meet").doc(chatID());
-
-  //       cRef.onSnapshot(async (snapshot) => {
-  //         const data = snapshot.data();
-
-  //         // If there is offer for chatId, set the getting call flag
-  //         if (
-  //           data &&
-  //           data.offer &&
-  //           !connecting &&
-  //           data.chatType === "video" &&
-  //           (
-  //             await db.collection("Users").doc(auth?.currentUser?.uid).get()
-  //           ).data()?.connection !== "close"
-  //         ) {
-  //           //
-  //           db.collection("Users")
-  //             .doc(auth?.currentUser?.uid)
-  //             .update({ connection: "close" });
-  //           //
-
-  //           navigation.navigate("Messages", {
-  //             screen: "VideoChat",
-  //             params: {
-  //               callee: auth?.currentUser?.uid,
-  //               caller: user.data().uid,
-  //               photo: user.data().photoUrl,
-  //             },
-  //           });
-  //         }
-
-  //         if (data && data.offer && !connecting && data.chatType === "audio") {
-  //           navigation.navigate("Messages", {
-  //             screen: "AudioChat",
-  //             params: {
-  //               callee: auth?.currentUser?.uid,
-  //               caller: user.data().uid,
-  //               photo: user.data().photoUrl,
-  //             },
-  //           });
-  //         }
-  //       });
-  //     });
-  //   });
-
-  //   return unsubscribe;
-  // }, []);
+  }, [navigation, profileLock]);
 
   useEffect(() => {
     if (userPhoto !== null) {
@@ -296,6 +242,10 @@ const ProfileScreen = (props) => {
         return null;
       }
     } else {
+      Alert.alert(
+        "No Image Selected!",
+        "Your profile cannot be created without an image!"
+      );
       return null;
     }
   };
@@ -330,6 +280,12 @@ const ProfileScreen = (props) => {
 
         auth.currentUser.updateProfile({ photoURL: photoUrl });
       }
+    }
+
+    if (checkProfileComplete() === true) {
+      setProfileLock(false);
+    } else {
+      setProfileLock(true);
     }
 
     await new Promise((resolve) => setTimeout(resolve, 2000));

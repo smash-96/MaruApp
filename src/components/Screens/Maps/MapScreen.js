@@ -37,8 +37,8 @@ import haversine from "haversine";
 const { width, height } = Dimensions.get("window");
 
 const ASPECT_RATIO = width / height;
-const LATITUDE = 31.529279325357457;
-const LONGITUDE = 74.34901334345341;
+const LATITUDE = 31.552094953842936;
+const LONGITUDE = 74.34618461877108;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const DEFAULT_PADDING = { top: 40, right: 40, bottom: 120, left: 40 };
@@ -95,10 +95,10 @@ const MapScreen = () => {
         let hName = (
           await db.collection("Users").doc(data.helperID).get()
         ).data().fname;
-        Alert.alert(
-          "Help Request Accepted!",
-          hName + " has agreed to help you. He'll be here shortly!"
-        );
+        // Alert.alert(
+        //   "Help Request Accepted!",
+        //   hName + " has agreed to help you. He'll be here shortly!"
+        // );
         console.log("Help Accepted");
         // set for helpee
         setGiveHelp(false);
@@ -108,12 +108,12 @@ const MapScreen = () => {
     return unsubscribe;
   }, []);
 
-  const simulatedGetMapRegion = () => ({
-    latitude: LATITUDE,
-    longitude: LONGITUDE,
-    latitudeDelta: LATITUDE_DELTA,
-    longitudeDelta: LONGITUDE_DELTA,
-  });
+  // const simulatedGetMapRegion = () => ({
+  //   latitude: LATITUDE,
+  //   longitude: LONGITUDE,
+  //   latitudeDelta: LATITUDE_DELTA,
+  //   longitudeDelta: LONGITUDE_DELTA,
+  // });
 
   const broadcastRequest = async (request) => {
     const cRef = db.collection("requests").doc(userID);
@@ -122,8 +122,8 @@ const MapScreen = () => {
       subject: request.subject || "NA",
       details: request.details || "NA",
       status: "open",
-      //locationHelpee: helpeeLocation,
-      locationHelpee: simulatedGetMapRegion(),
+      locationHelpee: helpeeLocation,
+      //locationHelpee: simulatedGetMapRegion(),
       ttl: request.time || "NA", // How soon does the helpee need help. E.g: within an hour
       timeStamp: firestore.FieldValue.serverTimestamp(),
     });
@@ -242,29 +242,6 @@ const MapScreen = () => {
     setHelperModalOpen(false);
   };
 
-  const callback = useCallback(
-    (location) => {
-      console.log("CALLBACK LOCATION", location);
-      dispatch(
-        setHelperLocation({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta: LATITUDE_DELTA,
-          longitudeDelta: LONGITUDE_DELTA,
-        })
-      );
-      console.log("helperLocation", helperLocation);
-      console.log("TID", t_id);
-
-      db.collection("requests")
-        .doc(t_id)
-        .collection("movingHelper")
-        .doc()
-        .update({ helperLocation });
-    },
-    [t_id, helperLocation]
-  );
-
   const accept = async (reqDoc) => {
     console.log("Request Accepted");
     //2nd corrdinate set for helper
@@ -364,6 +341,42 @@ const MapScreen = () => {
     }
   };
 
+  const callback = useCallback(
+    (location) => {
+      console.log("CALLBACK LOCATION", location);
+      dispatch(
+        setHelperLocation({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
+        })
+      );
+      console.log("helperLocation", helperLocation);
+      console.log("TID", t_id);
+
+      // if (t_id) {
+      //   db.collection("requests")
+      //     .doc(t_id)
+      //     .collection("movingHelper")
+      //     .doc()
+      //     .update({ helperLocation });
+      // }
+    },
+    [t_id, helperLocation]
+  );
+
+  const startNavigation = async () => {
+    console.log("Start Navigation");
+
+    if (!tracking) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setTracking(true);
+    } else {
+      setTracking(false);
+    }
+  };
+
   return (
     <View>
       <Modal transparent={true} visible={helpeeModalOpen}>
@@ -413,6 +426,12 @@ const MapScreen = () => {
           <Button
             title={giveHelp === true ? "Give Help?" : "Cancel Help"}
             onPress={helperAction}
+          />
+        )}
+        {helperLocation && helpeeLocation && userType === "helper" && (
+          <Button
+            title={tracking === false ? "Start Navigation" : "Stop Navigation"}
+            onPress={startNavigation}
           />
         )}
       </View>

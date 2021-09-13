@@ -1,6 +1,8 @@
 import authAPI from "../../firebase/firebaseAuth";
 //import { ErrorCode } from "../../ErrorCode";
 //import Geolocation from "@react-native-community/geolocation";
+import Geolocation from "react-native-geolocation-service";
+import { locationPermission, getCurrentLocation } from "./locationHelper";
 // import * as Facebook from 'expo-facebook';
 import * as Location from "expo-location";
 // import appleAuth, {
@@ -409,9 +411,10 @@ const handleSuccessfulLogin = (user, accountCreated) => {
 const fetchAndStoreExtraInfoUponLogin = async (user, accountCreated) => {
   authAPI.fetchAndStorePushTokenIfPossible(user);
 
-  getCurrentLocation().then(async (location) => {
-    const latitude = location.coords.latitude;
-    const longitude = location.coords.longitude;
+  getLocation().then(async (location) => {
+    console.log("getLocation", location);
+    const latitude = location.latitude;
+    const longitude = location.longitude;
     var locationData = {};
     if (location) {
       locationData = {
@@ -440,22 +443,28 @@ const fetchAndStoreExtraInfoUponLogin = async (user, accountCreated) => {
   });
 };
 
-const getCurrentLocation = () => {
+const getLocation = () => {
   return new Promise(async (resolve) => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      resolve({ coords: { latitude: "", longitude: "" } });
-      return;
-    }
+    // let { status } = await Location.requestForegroundPermissionsAsync();
+    // if (status !== "granted") {
+    //   resolve({ coords: { latitude: "", longitude: "" } });
+    //   return;
+    // }
 
-    await Location.getCurrentPositionAsync({}).then(
-      (location) => {
-        resolve(location);
-      },
-      (error) => {
-        console.log("LOCATION ERROR", error);
-      }
-    );
+    // await Location.getCurrentPositionAsync({}).then(
+    //   (location) => {
+    //     resolve(location);
+    //   },
+    //   (error) => {
+    //     console.log("LOCATION ERROR", error);
+    //   }
+    // );
+
+    let locPermissionDenied = await locationPermission();
+    if (locPermissionDenied) {
+      const location = await getCurrentLocation();
+      resolve(location);
+    }
 
     // setRegion(location.coords);
     // onLocationChange(location.coords);

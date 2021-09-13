@@ -7,10 +7,14 @@ import {
   Dimensions,
 } from "react-native";
 import { auth } from "../../firebase/firebaseConfig";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, {
+  Marker,
+  AnimatedRegion,
+  PROVIDER_GOOGLE,
+} from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import * as Location from "expo-location";
-import useLocation from "../Custom/useLocation";
+import { getCurrentLocation } from "../../components/Utils/locationHelper";
 import Constants from "expo-constants";
 //import tw from "tailwind-react-native-classnames";
 import { useSelector, useDispatch } from "react-redux";
@@ -28,14 +32,14 @@ import { GOOGLE_MAPS_APIKEY } from "@env";
 const { width, height } = Dimensions.get("window");
 
 const ASPECT_RATIO = width / height;
-const LATITUDE = 31.529279325357457;
-const LONGITUDE = 74.34901334345341;
+const LATITUDE = 31.552094953842936;
+const LONGITUDE = 74.34618461877108;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-const DEFAULT_PADDING = { top: 200, right: 40, bottom: 120, left: 40 };
+const DEFAULT_PADDING = { top: 200, right: 40, bottom: 220, left: 40 };
 const userID = auth?.currentUser?.uid;
 
-const Map = (props) => {
+const Map = () => {
   const dispatch = useDispatch();
   const helpeeLocation = useSelector(selectHelpeeLocation);
   const helperLocation = useSelector(selectHelperLocation);
@@ -45,25 +49,15 @@ const Map = (props) => {
   const [longitude, setLongitude] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
-  const [zoom, setZoom] = useState(false);
-  const [movingHelperLocation, setMovingHelperLocation] = useState(null);
+
   const mapRef = useRef();
+  const markerRef = useRef();
 
   useEffect(() => {
     if (helperLocation && helpeeLocation) return;
-
     if (currentUser?.user?.location) {
       setLatitude(currentUser.user.location.latitude);
       setLongitude(currentUser.user.location.longitude);
-
-      // dispatch(
-      //   setUserLocation({
-      //     latitude: latitude,
-      //     longitude: longitude,
-      //     latitudeDelta: LATITUDE_DELTA,
-      //     longitudeDelta: LONGITUDE_DELTA,
-      //   })
-      // );
 
       if (userType === "helper") {
         //1st corrdinate set for helper
@@ -115,83 +109,69 @@ const Map = (props) => {
     }
   }, [loading]);
 
-  // const callback = useCallback((location) => {
-  //   //console.log("CALLBACK LOCATION", location);
-  //   dispatch(
-  //     setHelperLocation({
-  //       latitude: location.coords.latitude,
-  //       longitude: location.coords.longitude,
-  //       latitudeDelta: LATITUDE_DELTA,
-  //       longitudeDelta: LONGITUDE_DELTA,
-  //     })
-  //   );
-  //   setLatitude(location.coords.latitude);
-  //   setLongitude(location.coords.longitude);
-  // }, []);
+  const getLiveLocation = async () => {
+    // Tracking needed only for helper
+    if (userType === "helper") {
+      const location = await getCurrentLocation();
+      console.log("Get Live Location", location);
+      animate(location);
+      dispatch(
+        setHelperLocation({
+          latitude: location.latitude,
+          longitude: location.longitude,
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
+        })
+      );
 
-  //const [error] = useLocation(props.tracking, props.callback);
+      // Setting these so marker doesn't return to initial stage after person has stopped moving
+      setLatitude(location.latitude);
+      setLongitude(location.longitude);
+    }
+  };
 
   useEffect(() => {
-    if (!helperLocation || !helpeeLocation) return;
-    // Zoom to fit markers
-    // mapRef.current.fitToCoordinates([
-    //   {
-    //     latitude: helperLocation.latitude,
-    //     longitude: helperLocation.longitude,
-    //   },
-    //   {
-    //     latitude: helpeeLocation.latitude,
-    //     longitude: helpeeLocation.longitude,
-    //   },
-    // ]);
-    // try {
-    //   if (mapRef.current) {
-    //     mapRef.current.fitToSuppliedMarkers([
-    //       "helperLocation",
-    //       "helpeeLocation",
-    //     ]);
-    //     console.log("fitToSuppliedMarkers");
-    //   }
-    // } catch (err) {
-    //   console.log("Marker Error", err);
-    // }
+    const interval = setInterval(() => {
+      getLiveLocation();
+    }, 4000);
 
-    mapRef.current.fitToSuppliedMarkers(["helperLocation", "helpeeLocation"], {
-      edgePadding: DEFAULT_PADDING,
-      animated: true,
+    return () => clearInterval(interval);
+  });
+
+  const animate = ({ latitude, longitude }) => {
+    const newCoordinate = { latitude, longitude };
+    if (Platform.OS == "android") {
+      if (markerRef.current) {
+        markerRef.current.animateMarkerToCoordinate(newCoordinate, 5000);
+      }
+    } else {
+      coordinate.timing(newCoordinate).start();
+    }
+  };
+
+  const onCenter = () => {
+    mapRef.current.animateToRegion({
+      latitude: latitude,
+      longitude: longitude,
+      latitudeDelta: LATITUDE_DELTA,
+      longitudeDelta: LONGITUDE_DELTA,
     });
+  };
 
-    //setZoom(true);
-  }, [helperLocation, helpeeLocation]);
-
-  // const fitAllMarkers = () => {
-  //   try {
-  //     if (mapRef.current) {
-  //       console.log("FIT Marker", coordinates.current);
-  // mapRef.current.fitToCoordinates(
-  //   [
-  //     { latitude: 31.5113059, longitude: 74.354887 },
-  //     { latitude: 31.56192, longitude: 74.348083 },
-  //   ],
-  //         //coordinates.current,
-  //         {
-  //           edgePadding: DEFAULT_PADDING,
-  //           animated: true,
-  //         }
-  //       );
-  //       setZoom(true);
-  //     }
-  //   } catch (e) {
-  //     console.log("Marker Error", e);
-  //   }
-  // };
-
-  const helperMapRegion = () => ({
-    latitude: helperLocation.latitude,
-    longitude: helperLocation.longitude,
+  const getMapRegion = () => ({
+    latitude: latitude,
+    longitude: longitude,
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   });
+
+  const helperMapRegion = () =>
+    new AnimatedRegion({
+      latitude: helperLocation.latitude,
+      longitude: helperLocation.longitude,
+      latitudeDelta: LATITUDE_DELTA,
+      longitudeDelta: LONGITUDE_DELTA,
+    });
 
   const helpeeMapRegion = () => ({
     latitude: helpeeLocation.latitude,
@@ -200,21 +180,22 @@ const Map = (props) => {
     longitudeDelta: LONGITUDE_DELTA,
   });
 
-  const simulatedGetMapRegion = () => ({
-    latitude: LATITUDE,
-    longitude: LONGITUDE,
-    latitudeDelta: LATITUDE_DELTA,
-    longitudeDelta: LONGITUDE_DELTA,
-  });
+  // const simulatedGetMapRegion = () => ({
+  //   latitude: LATITUDE,
+  //   longitude: LONGITUDE,
+  //   latitudeDelta: LATITUDE_DELTA,
+  //   longitudeDelta: LONGITUDE_DELTA,
+  // });
 
   //show on simulator
-  if (Constants.isDevice === false) {
+  if (loading === false && Constants.isDevice === false) {
     return (
       <MapView
         ref={mapRef}
         provider={PROVIDER_GOOGLE}
         style={styles.map}
-        region={simulatedGetMapRegion()}
+        initialRegion={getMapRegion()}
+        //region={helpeeMapRegion()}
         //showsUserLocation={true}
       >
         {helperLocation && helpeeLocation && (
@@ -224,10 +205,22 @@ const Map = (props) => {
             apikey={GOOGLE_MAPS_APIKEY}
             strokeWidth={3}
             strokeColor="black"
+            onStart={(params) => {
+              console.log("onStart", params);
+            }}
+            onReady={(result) => {
+              mapRef.current.fitToCoordinates(result.coordinates, {
+                edgePadding: {},
+              });
+            }}
+            onError={(err) => {
+              console.log("MapViewDirections Error", err);
+            }}
           />
         )}
         {helperLocation?.latitude && helperLocation?.longitude && (
-          <Marker
+          <Marker.Animated
+            ref={markerRef}
             // coordinate={{
             //   latitude: simulatedGetMapRegion().latitude,
             //   longitude: simulatedGetMapRegion().longitude,
@@ -248,8 +241,8 @@ const Map = (props) => {
             //   longitude: helpeeLocation.longitude,
             // }}
             coordinate={{
-              latitude: simulatedGetMapRegion().latitude,
-              longitude: simulatedGetMapRegion().longitude,
+              latitude: helpeeMapRegion().latitude,
+              longitude: helpeeMapRegion().longitude,
             }}
             title="Helpee"
             description={"I need help!"}
@@ -268,7 +261,10 @@ const Map = (props) => {
         //provider={PROVIDER_GOOGLE}
         //style={tw`flex-1`}
         style={styles.map}
-        region={userType === "helper" ? helperMapRegion() : helpeeMapRegion()}
+        initialRegion={getMapRegion()}
+        // initialRegion={
+        //   userType === "helper" ? helperMapRegion() : helpeeMapRegion()
+        // }
         //showsUserLocation={true}
       >
         {helperLocation && helpeeLocation && (
@@ -278,10 +274,24 @@ const Map = (props) => {
             apikey={GOOGLE_MAPS_APIKEY}
             strokeWidth={3}
             strokeColor="black"
+            //optimizeWaypoints={true}
+            resetOnChange={false}
+            onStart={(params) => {
+              console.log("onStart", params);
+            }}
+            onReady={(result) => {
+              mapRef.current.fitToCoordinates(result.coordinates, {
+                edgePadding: {},
+              });
+            }}
+            onError={(err) => {
+              console.log("MapViewDirections Error", err);
+            }}
           />
         )}
         {helperLocation?.latitude && helperLocation?.longitude && (
-          <Marker
+          <Marker.Animated
+            ref={markerRef}
             // coordinate={{
             //   latitude: helperLocation.latitude,
             //   longitude: helperLocation.longitude,
@@ -307,7 +317,7 @@ const Map = (props) => {
     );
   }
 
-  if (loading === true && Constants.isDevice === true) {
+  if (loading === true) {
     return (
       <View
         style={{

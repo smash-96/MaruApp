@@ -28,8 +28,10 @@ export default (shouldTrack, callback) => {
     };
 
     if (shouldTrack) {
+      console.log("Start Tracking");
       startWatching();
     } else {
+      console.log("Stop Tracking");
       subscriber?.remove();
       subscriber = null;
     }

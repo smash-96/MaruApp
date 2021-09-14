@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -59,10 +59,28 @@ const MapScreen = () => {
 
   const [helperModalData, setHelperModalData] = useState(null);
 
-  const [refresh, doRefresh] = useState(0);
+  const [refresh, doRefresh] = useState(0); // To trigger function in Map(child)
 
   const navigation = useNavigation();
   const [t_id, setT_id] = useState(null);
+
+  useLayoutEffect(() => {
+    if (activeRequestData) {
+      if (activeRequestData.status === "open" && userType === "helpee") {
+        setNeedHelp(false);
+      } else if (activeRequestData.status === "InProgress") {
+        if (userType === "helper") {
+          setT_id(activeRequestData.helpeeID); // set helpee ID for helper to delete
+          setNeedHelp(false);
+          setGiveHelp(false);
+
+          dispatch(setHelpeeLocation(activeRequestData.locationHelpee));
+        } else {
+          setNeedHelp(false);
+        }
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const cRef = db.collection("requests");
@@ -144,14 +162,9 @@ const MapScreen = () => {
       ttl: request.time || "NA", // How soon does the helpee need help. E.g: within an hour
       timeStamp: firestore.FieldValue.serverTimestamp(),
     });
-    // db.collection("Users")
-    //   .doc(userID)
-    //   .update({
-    //     helpRequestData: {
-    //       occupied: true,
-    //       requestID: userID,
-    //     },
-    //   });
+    db.collection("Users").doc(userID).update({
+      helpRequestID: userID,
+    });
     Alert.alert(
       "Request Sent!",
       "Your request is broadcasted. We'll let you know if some one decides to aid you!"
@@ -265,6 +278,10 @@ const MapScreen = () => {
         initialHelperLocation: helperLocation,
         //locationHelper: simulatedGetMapRegion(),
       });
+
+      db.collection("Users").doc(userID).update({
+        helpRequestID: helperModalData.helpeeID,
+      });
       setT_id(helperModalData.helpeeID); // set helpee ID for helper to delete
       accept(helperModalData);
     } else {
@@ -342,6 +359,9 @@ const MapScreen = () => {
         );
       }
     }
+    db.collection("Users").doc(userID).update({
+      helpRequestID: null,
+    });
   };
 
   const enterChat = async () => {
@@ -453,9 +473,9 @@ const MapScreen = () => {
       </View>
       <View
         style={{
-          position: "absolute", //use absolute position to show button on top of the map
-          bottom: 20,
-          left: "40%",
+          position: "absolute",
+          bottom: 0,
+          right: 0,
         }}
       >
         {needHelp === false && giveHelp === false ? (

@@ -56,6 +56,7 @@ const Signup = (props) => {
             password: values.pass,
             fname: values.fname,
             lname: values.lname,
+            helpRequestID: null,
             //createdAt: firestore.FieldValue.serverTimestamp(),
           })
           .then(() => {

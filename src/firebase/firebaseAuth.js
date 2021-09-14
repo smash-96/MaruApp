@@ -429,6 +429,21 @@ export const updateProfilePhoto = (userID, profilePictureURL) => {
   });
 };
 
+// export const fetchHelpRequestData = async (user) => {
+//   //console.log("fetchHelpRequestData", user);
+
+//   const requestID = (await usersRef.doc(user.uid).get()).data().helpRequestID;
+//   console.log("requestID", requestID);
+//   if (requestID !== null) {
+//     const requestData = (
+//       await db.collection("requests").doc(requestID).get()
+//     ).data();
+//     console.log("requestData", requestData);
+//     return requestData;
+//   }
+//   return requestID;
+// };
+
 export const fetchAndStorePushTokenIfPossible = async (user) => {
   try {
     const settings = await messaging().requestPermission();
@@ -482,6 +497,7 @@ export const getUserByID = async (userID) => {
 const authAPI = {
   loginWithEmailAndPassword,
   retrievePersistedAuthUser,
+  //fetchHelpRequestData,
   fetchAndStorePushTokenIfPossible,
   getUserByID,
   updateProfilePhoto,

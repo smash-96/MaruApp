@@ -117,7 +117,6 @@ const Map = (props) => {
     // Tracking needed only for helper
     if (userType === "helper") {
       const location = await getCurrentLocation();
-      console.log("Get Live Location", location);
       animate(location);
       dispatch(
         setHelperLocation({
@@ -144,6 +143,31 @@ const Map = (props) => {
     }
   };
 
+  const fetchLiveLocation = async () => {
+    if (userType === "helpee") {
+      // Check for helpee
+      if (activeRequestData?.helperID) {
+        const locationData = (
+          await db.collection("requests").doc(userID).get()
+        ).data().locationHelper;
+
+        try {
+          animate(locationData);
+          dispatch(
+            setHelperLocation({
+              latitude: locationData.latitude,
+              longitude: locationData.longitude,
+              latitudeDelta: LATITUDE_DELTA,
+              longitudeDelta: LONGITUDE_DELTA,
+            })
+          );
+        } catch (err) {
+          console.log("HELPEE ERROR", err);
+        }
+      }
+    }
+  };
+
   useEffect(() => {
     const interval1 = setInterval(() => {
       if (userType === "helper") {
@@ -162,33 +186,6 @@ const Map = (props) => {
       clearInterval(interval2);
     };
   });
-
-  const fetchLiveLocation = async () => {
-    if (userType === "helpee") {
-      // Check for helpee
-      if (activeRequestData?.helperID) {
-        const locationData = (
-          await db.collection("requests").doc(userID).get()
-        ).data().locationHelper;
-
-        console.log("locationData", locationData);
-
-        try {
-          animate(locationData);
-          dispatch(
-            setHelperLocation({
-              latitude: locationData.latitude,
-              longitude: locationData.longitude,
-              latitudeDelta: LATITUDE_DELTA,
-              longitudeDelta: LONGITUDE_DELTA,
-            })
-          );
-        } catch (err) {
-          console.log("HELPEE ERROR", err);
-        }
-      }
-    }
-  };
 
   useEffect(() => {
     if (!loading) {
@@ -269,7 +266,7 @@ const Map = (props) => {
             }}
             onReady={(result) => {
               mapRef.current.fitToCoordinates(result.coordinates, {
-                edgePadding: {},
+                edgePadding: { top: 200, right: 40, bottom: 220, left: 40 },
               });
             }}
             onError={(err) => {

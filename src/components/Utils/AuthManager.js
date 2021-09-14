@@ -402,6 +402,7 @@ const handleSuccessfulSignup = (user, accountCreated) => {
 const handleSuccessfulLogin = (user, accountCreated) => {
   // After a successful login, we fetch & store the device token for push notifications, location, online status, etc.
   // we don't wait for fetching & updating the location or push token, for performance reasons (especially on Android)
+
   fetchAndStoreExtraInfoUponLogin(user, accountCreated);
   return new Promise((resolve) => {
     resolve({ user: { ...user } });

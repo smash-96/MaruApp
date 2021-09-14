@@ -37,6 +37,7 @@ import {
   selectUserAge,
   selectConnecting,
 } from "../../../slices/userInfoSlice";
+import { selectActiveRequestData } from "../../../slices/helpRequestSlice";
 import { useNavigation } from "@react-navigation/native";
 import Picker from "../../Custom/Picker";
 import { Icon } from "react-native-elements";
@@ -52,7 +53,7 @@ const ProfileScreen = (props) => {
   const userAddress = useSelector(selectUserAddress);
   const userGender = useSelector(selectUserGender);
   const userAge = useSelector(selectUserAge);
-  const connecting = useSelector(selectConnecting);
+  const activeRequestData = useSelector(selectActiveRequestData);
 
   const baseAvatar =
     "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg";
@@ -251,46 +252,56 @@ const ProfileScreen = (props) => {
   };
 
   const submit = async () => {
-    setUploading(true);
-    const cRef = db.collection("Users").doc(auth?.currentUser?.uid);
-    cRef.update({
-      fname: fname,
-      lname: lname,
-      Address: address,
-      Gender: gender,
-      Age: age,
-      userType: uType,
-    });
+    if (!activeRequestData) {
+      setUploading(true);
+      const cRef = db.collection("Users").doc(auth?.currentUser?.uid);
+      cRef.update({
+        fname: fname,
+        lname: lname,
+        Address: address,
+        Gender: gender,
+        Age: age,
+        userType: uType,
+      });
 
-    dispatch(setUserFname(fname));
-    dispatch(setUserLname(lname));
-    dispatch(setUserAddress(address));
-    dispatch(setUserGender(gender));
-    dispatch(setUserAge(age));
-    dispatch(setUserType(uType));
+      dispatch(setUserFname(fname));
+      dispatch(setUserLname(lname));
+      dispatch(setUserAddress(address));
+      dispatch(setUserGender(gender));
+      dispatch(setUserAge(age));
+      dispatch(setUserType(uType));
 
-    let photoUrl;
-    if (image !== baseAvatar) {
-      photoUrl = await uploadImage();
-      if (photoUrl != null) {
-        cRef.update({
-          photoUrl: photoUrl,
-        });
-        dispatch(setUserPhoto(photoUrl));
+      let photoUrl;
+      if (image !== baseAvatar) {
+        photoUrl = await uploadImage();
+        if (photoUrl != null) {
+          cRef.update({
+            photoUrl: photoUrl,
+          });
+          dispatch(setUserPhoto(photoUrl));
 
-        auth.currentUser.updateProfile({ photoURL: photoUrl });
+          auth.currentUser.updateProfile({ photoURL: photoUrl });
+        }
       }
-    }
 
-    if (checkProfileComplete() === true) {
-      setProfileLock(false);
+      if (checkProfileComplete() === true) {
+        setProfileLock(false);
+      } else {
+        setProfileLock(true);
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setUploading(false);
+      Alert.alert(
+        I18n.t("profile.alert1.header"),
+        I18n.t("profile.alert1.text")
+      );
     } else {
-      setProfileLock(true);
+      Alert.alert(
+        "Request in progress",
+        "Kindly complete or cancel the help request to modify your profile"
+      );
     }
-
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setUploading(false);
-    Alert.alert(I18n.t("profile.alert1.header"), I18n.t("profile.alert1.text"));
   };
 
   //

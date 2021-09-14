@@ -13,7 +13,7 @@ import { SocialIcon } from "react-native-elements";
 import { Container, Content } from "native-base";
 import dynamic_styles from "./LoginStyles";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scrollview";
-import { auth } from "../../../firebase/firebaseConfig";
+import { auth, db } from "../../../firebase/firebaseConfig";
 import messaging from "@react-native-firebase/messaging";
 import I18n from "../../../localization/utils/language";
 import authManager from "../../Utils/AuthManager";
@@ -30,6 +30,7 @@ import {
   setUserAge,
 } from "../../../slices/userInfoSlice";
 import { setUserData, selectUserData } from "../../../slices/userAuthSlice";
+import { setActiveRequestData } from "../../../slices/helpRequestSlice";
 import { showMessage, hideMessage } from "react-native-flash-message";
 
 import { Formik } from "formik";
@@ -83,9 +84,22 @@ const Login = (props) => {
   const tryToLoginFirst = async () => {
     authManager
       .retrievePersistedAuthUser()
-      .then((response) => {
+      .then(async (response) => {
         if (response?.user) {
           const user = response.user;
+
+          const requestID = (
+            await db.collection("Users").doc(user.uid).get()
+          ).data().helpRequestID;
+          if (requestID !== null) {
+            const requestData = (
+              await db.collection("requests").doc(requestID).get()
+            ).data();
+            dispatch(setActiveRequestData(requestData));
+          } else {
+            dispatch(setActiveRequestData(null));
+          }
+
           // console.log("LOGIN USER", user);
           // delete user["createdAt"];
           // delete user["lastOnlineTimestamp"];
@@ -182,9 +196,22 @@ const Login = (props) => {
     setLoading(true);
     authManager
       .loginWithEmailAndPassword(values.email, values.pass)
-      .then((response) => {
+      .then(async (response) => {
         if (response?.user) {
           const user = response.user;
+
+          const requestID = (
+            await db.collection("Users").doc(user.uid).get()
+          ).data().helpRequestID;
+          if (requestID !== null) {
+            const requestData = (
+              await db.collection("requests").doc(requestID).get()
+            ).data();
+            dispatch(setActiveRequestData(requestData));
+          } else {
+            dispatch(setActiveRequestData(null));
+          }
+
           // delete user["createdAt"];
           // delete user["lastOnlineTimestamp"];
           //console.log("USER_NEW", user);

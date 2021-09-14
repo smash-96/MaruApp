@@ -6,7 +6,7 @@ import {
   ActivityIndicator,
   Dimensions,
 } from "react-native";
-import { auth } from "../../firebase/firebaseConfig";
+import { auth, db } from "../../firebase/firebaseConfig";
 import MapView, {
   Marker,
   AnimatedRegion,
@@ -27,6 +27,7 @@ import {
   setHelperLocation,
 } from "../../slices/userInfoSlice";
 import { selectUserData } from "../../slices/userAuthSlice";
+import { selectActiveRequestData } from "../../slices/helpRequestSlice";
 import { GOOGLE_MAPS_APIKEY } from "@env";
 
 const { width, height } = Dimensions.get("window");
@@ -39,12 +40,13 @@ const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const DEFAULT_PADDING = { top: 200, right: 40, bottom: 220, left: 40 };
 const userID = auth?.currentUser?.uid;
 
-const Map = () => {
+const Map = (props) => {
   const dispatch = useDispatch();
   const helpeeLocation = useSelector(selectHelpeeLocation);
   const helperLocation = useSelector(selectHelperLocation);
   const userType = useSelector(selectUserType);
   const currentUser = useSelector(selectUserData);
+  const activeRequestData = useSelector(selectActiveRequestData);
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -82,6 +84,8 @@ const Map = () => {
       }
       setLoading(false);
       setErrorMsg(null);
+
+      //onCenter();
     } else {
       console.log("Location fetching error");
       if (userType === "helper") {
@@ -127,16 +131,70 @@ const Map = () => {
       // Setting these so marker doesn't return to initial stage after person has stopped moving
       setLatitude(location.latitude);
       setLongitude(location.longitude);
+
+      // Check for helper
+      if (activeRequestData?.helpeeID) {
+        await db
+          .collection("requests")
+          .doc(activeRequestData?.helpeeID)
+          .update({
+            locationHelper: helperLocation,
+          });
+      }
     }
   };
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      getLiveLocation();
+    const interval1 = setInterval(() => {
+      if (userType === "helper") {
+        getLiveLocation();
+      }
+    }, 2000);
+
+    const interval2 = setInterval(() => {
+      if (userType === "helpee") {
+        fetchLiveLocation();
+      }
     }, 4000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval1);
+      clearInterval(interval2);
+    };
   });
+
+  const fetchLiveLocation = async () => {
+    if (userType === "helpee") {
+      // Check for helpee
+      if (activeRequestData?.helperID) {
+        const locationData = (
+          await db.collection("requests").doc(userID).get()
+        ).data().locationHelper;
+
+        console.log("locationData", locationData);
+
+        try {
+          animate(locationData);
+          dispatch(
+            setHelperLocation({
+              latitude: locationData.latitude,
+              longitude: locationData.longitude,
+              latitudeDelta: LATITUDE_DELTA,
+              longitudeDelta: LONGITUDE_DELTA,
+            })
+          );
+        } catch (err) {
+          console.log("HELPEE ERROR", err);
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!loading) {
+      onCenter();
+    }
+  }, [props.refresh]);
 
   const animate = ({ latitude, longitude }) => {
     const newCoordinate = { latitude, longitude };
@@ -205,6 +263,7 @@ const Map = () => {
             apikey={GOOGLE_MAPS_APIKEY}
             strokeWidth={3}
             strokeColor="black"
+            resetOnChange={false}
             onStart={(params) => {
               console.log("onStart", params);
             }}
@@ -214,7 +273,7 @@ const Map = () => {
               });
             }}
             onError={(err) => {
-              console.log("MapViewDirections Error", err);
+              console.log("My MapViewDirections Error", err);
             }}
           />
         )}
@@ -225,10 +284,7 @@ const Map = () => {
             //   latitude: simulatedGetMapRegion().latitude,
             //   longitude: simulatedGetMapRegion().longitude,
             // }}
-            coordinate={{
-              latitude: helperLocation.latitude,
-              longitude: helperLocation.longitude,
-            }}
+            coordinate={helperMapRegion()}
             title="Helper"
             description={"I am coming to help you!"}
             identifier="helperLocation"
@@ -262,9 +318,6 @@ const Map = () => {
         //style={tw`flex-1`}
         style={styles.map}
         initialRegion={getMapRegion()}
-        // initialRegion={
-        //   userType === "helper" ? helperMapRegion() : helpeeMapRegion()
-        // }
         //showsUserLocation={true}
       >
         {helperLocation && helpeeLocation && (
@@ -281,11 +334,11 @@ const Map = () => {
             }}
             onReady={(result) => {
               mapRef.current.fitToCoordinates(result.coordinates, {
-                edgePadding: {},
+                edgePadding: { top: 200, right: 40, bottom: 220, left: 40 },
               });
             }}
             onError={(err) => {
-              console.log("MapViewDirections Error", err);
+              console.log("My MapViewDirections Error", err);
             }}
           />
         )}
@@ -304,10 +357,11 @@ const Map = () => {
         )}
         {helpeeLocation?.latitude && helpeeLocation?.longitude && (
           <Marker
-            coordinate={{
-              latitude: helpeeLocation.latitude,
-              longitude: helpeeLocation.longitude,
-            }}
+            // coordinate={{
+            //   latitude: helpeeLocation.latitude,
+            //   longitude: helpeeLocation.longitude,
+            // }}
+            coordinate={helpeeMapRegion()}
             title="Helpee"
             description={"I need help!"}
             identifier="helpeeLocation"

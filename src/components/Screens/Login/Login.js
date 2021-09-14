@@ -30,6 +30,7 @@ import {
   setUserAge,
 } from "../../../slices/userInfoSlice";
 import { setUserData, selectUserData } from "../../../slices/userAuthSlice";
+import { showMessage, hideMessage } from "react-native-flash-message";
 
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -161,12 +162,18 @@ const Login = (props) => {
         // }
       }
     });
-    // messaging().onMessage((remoteMessage) => {
-    //   if (remoteMessage && Platform.OS === "ios") {
-    //     const userID = currentUser?.id || currentUser?.userID;
-    //     updateUser(userID, { badgeCount: 0 });
-    //   }
-    // });
+    messaging().onMessage((remoteMessage) => {
+      // if (remoteMessage && Platform.OS === "ios") {
+      //   const userID = currentUser?.id || currentUser?.userID;
+      //   updateUser(userID, { badgeCount: 0 });
+      // }
+      if (remoteMessage) {
+        showMessage({
+          message: remoteMessage.data.fname,
+          type: "message",
+        });
+      }
+    });
   };
   //
 

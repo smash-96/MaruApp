@@ -1,15 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
-  SafeAreaView,
   StyleSheet,
   View,
-  Text,
-  ActivityIndicator,
   Button,
   Alert,
   TouchableOpacity,
   Dimensions,
   Modal,
+  Image,
 } from "react-native";
 import { Avatar, Icon } from "react-native-elements";
 import { auth, db } from "../../../firebase/firebaseConfig";
@@ -19,18 +17,19 @@ import HelpForm from "../HelpDetailForm/HelpForm";
 import tw from "tailwind-react-native-classnames";
 import { useNavigation } from "@react-navigation/native";
 import Map from "../../Custom/Map";
-import useLocation from "../../Custom/useLocation";
 import { useSelector, useDispatch } from "react-redux";
 import {
   selectUserType,
   selectUserLocation,
-} from "../../../slices/userInfoSlice";
-import {
   selectHelperLocation,
   setHelperLocation,
   selectHelpeeLocation,
   setHelpeeLocation,
 } from "../../../slices/userInfoSlice";
+import {
+  setActiveRequestData,
+  selectActiveRequestData,
+} from "../../../slices/helpRequestSlice";
 import uuid from "react-native-uuid";
 import haversine from "haversine";
 
@@ -47,9 +46,9 @@ const userID = auth?.currentUser?.uid;
 const MapScreen = () => {
   const dispatch = useDispatch();
   const userType = useSelector(selectUserType);
-  const userLocation = useSelector(selectUserLocation);
   const helpeeLocation = useSelector(selectHelpeeLocation);
   const helperLocation = useSelector(selectHelperLocation);
+  const activeRequestData = useSelector(selectActiveRequestData);
 
   const [needHelp, setNeedHelp] = useState(true);
   const [giveHelp, setGiveHelp] = useState(true);
@@ -59,6 +58,8 @@ const MapScreen = () => {
   const [tracking, setTracking] = useState(false);
 
   const [helperModalData, setHelperModalData] = useState(null);
+
+  const [refresh, doRefresh] = useState(0);
 
   const navigation = useNavigation();
   const [t_id, setT_id] = useState(null);
@@ -91,10 +92,18 @@ const MapScreen = () => {
             longitudeDelta: LONGITUDE_DELTA,
           })
         );
-        setT_id(data.helperID);
-        let hName = (
-          await db.collection("Users").doc(data.helperID).get()
-        ).data().fname;
+        setT_id(data?.helperID);
+
+        const requestData = {
+          ...activeRequestData,
+          helperID: data?.helperID,
+          status: "InProgress",
+          locationHelper: helperLocation,
+        };
+        dispatch(setActiveRequestData(requestData));
+        // let hName = (
+        //   await db.collection("Users").doc(data.helperID).get()
+        // ).data().fname;
         // Alert.alert(
         //   "Help Request Accepted!",
         //   hName + " has agreed to help you. He'll be here shortly!"
@@ -116,6 +125,14 @@ const MapScreen = () => {
   // });
 
   const broadcastRequest = async (request) => {
+    const requestData = {
+      helpeeID: userID,
+      helperID: null,
+      status: "open",
+      locationHelpee: helpeeLocation,
+      locationHelper: null,
+    };
+    dispatch(setActiveRequestData(requestData));
     const cRef = db.collection("requests").doc(userID);
     cRef.set({
       helpeeID: userID,
@@ -127,6 +144,14 @@ const MapScreen = () => {
       ttl: request.time || "NA", // How soon does the helpee need help. E.g: within an hour
       timeStamp: firestore.FieldValue.serverTimestamp(),
     });
+    // db.collection("Users")
+    //   .doc(userID)
+    //   .update({
+    //     helpRequestData: {
+    //       occupied: true,
+    //       requestID: userID,
+    //     },
+    //   });
     Alert.alert(
       "Request Sent!",
       "Your request is broadcasted. We'll let you know if some one decides to aid you!"
@@ -219,15 +244,25 @@ const MapScreen = () => {
   };
 
   const acceptRequest = async () => {
+    const requestData = {
+      helpeeID: helperModalData.helpeeID,
+      helperID: userID,
+      status: "open",
+      locationHelpee: helperModalData.locationHelpee,
+      locationHelper: helperLocation,
+    };
+    dispatch(setActiveRequestData(requestData));
+
     const requests = await db.collection("requests");
     if (
       (await requests.doc(helperModalData.id).get()).data().status !=
       "InProgress"
     ) {
       requests.doc(helperModalData.id).update({
-        helperID: auth?.currentUser?.uid,
+        helperID: userID,
         status: "InProgress",
         locationHelper: helperLocation,
+        initialHelperLocation: helperLocation,
         //locationHelper: simulatedGetMapRegion(),
       });
       setT_id(helperModalData.helpeeID); // set helpee ID for helper to delete
@@ -261,10 +296,6 @@ const MapScreen = () => {
     // set for helper
     setGiveHelp(false);
     setNeedHelp(false);
-    //await new Promise((resolve) => setTimeout(resolve, 2000));
-    //setTracking(true);
-
-    //const [error] = useLocation(true, callback);
   };
 
   const clearRequest = async () => {
@@ -278,10 +309,9 @@ const MapScreen = () => {
     } else if (userType === "helpee") {
       dispatch(setHelperLocation(null));
     }
+    dispatch(setActiveRequestData(null));
     setNeedHelp(true);
     setGiveHelp(true);
-    //await new Promise((resolve) => setTimeout(resolve, 2000));
-    //setTracking(false);
   };
 
   const firestoreCleanUp = async () => {
@@ -341,31 +371,6 @@ const MapScreen = () => {
     }
   };
 
-  const callback = useCallback(
-    (location) => {
-      console.log("CALLBACK LOCATION", location);
-      dispatch(
-        setHelperLocation({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta: LATITUDE_DELTA,
-          longitudeDelta: LONGITUDE_DELTA,
-        })
-      );
-      console.log("helperLocation", helperLocation);
-      console.log("TID", t_id);
-
-      // if (t_id) {
-      //   db.collection("requests")
-      //     .doc(t_id)
-      //     .collection("movingHelper")
-      //     .doc()
-      //     .update({ helperLocation });
-      // }
-    },
-    [t_id, helperLocation]
-  );
-
   const startNavigation = async () => {
     console.log("Start Navigation");
 
@@ -406,8 +411,19 @@ const MapScreen = () => {
         <Icon name="menu" />
       </TouchableOpacity>
       <View style={tw`h-full`}>
-        <Map tracking={tracking} callback={callback} />
+        <Map tracking={tracking} refresh={refresh} />
       </View>
+
+      <TouchableOpacity
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+        }}
+        onPress={() => doRefresh((prev) => prev + 1)}
+      >
+        <Image source={require("../../../assets/greenIndicator.png")} />
+      </TouchableOpacity>
 
       <View
         style={{
@@ -428,12 +444,12 @@ const MapScreen = () => {
             onPress={helperAction}
           />
         )}
-        {helperLocation && helpeeLocation && userType === "helper" && (
+        {/* {helperLocation && helpeeLocation && userType === "helper" && (
           <Button
             title={tracking === false ? "Start Navigation" : "Stop Navigation"}
             onPress={startNavigation}
           />
-        )}
+        )} */}
       </View>
       <View
         style={{

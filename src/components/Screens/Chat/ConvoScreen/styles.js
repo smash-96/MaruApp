@@ -18,8 +18,9 @@ const dynamic_styles = () => {
       backgroundColor: "#ECECEC",
       //borderWidth: 1,
       padding: 10,
-      color: "grey",
+      color: "black",
       borderRadius: 30,
+      fontSize: 15,
     },
     sender: {
       padding: 15,

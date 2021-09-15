@@ -43,7 +43,9 @@ const ConvoScreen = (props) => {
           <Avatar
             rounded
             source={{
-              uri: props.route.params.photo,
+              uri:
+                props.route.params.photo ||
+                "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg",
             }}
           />
           <Text
@@ -68,9 +70,10 @@ const ConvoScreen = (props) => {
           >
             <Avatar
               rounded
-              source={{
-                uri: "https://img.icons8.com/ios/452/long-arrow-left.png",
-              }}
+              // source={{
+              //   uri: "https://img.icons8.com/ios/452/long-arrow-left.png",
+              // }}
+              source={require("../../../../assets/backChat.png")}
             />
           </TouchableOpacity>
         </View>
@@ -87,16 +90,18 @@ const ConvoScreen = (props) => {
           <TouchableOpacity onPress={audioCall} activeOpacity={0.5}>
             <Avatar
               rounded
-              source={{
-                uri: "https://cdn.icon-icons.com/icons2/2440/PNG/512/phone_call_icon_148513.png",
-              }}
+              // source={{
+              //   uri: "https://cdn.icon-icons.com/icons2/2440/PNG/512/phone_call_icon_148513.png",
+              // }}
+              source={require("../../../../assets/audiocall.png")}
             />
           </TouchableOpacity>
           <TouchableOpacity onPress={videoCall} activeOpacity={0.5}>
             <Avatar
-              source={{
-                uri: "https://img.icons8.com/ios/452/video-call.png",
-              }}
+              // source={{
+              //   uri: "https://img.icons8.com/ios/452/video-call.png",
+              // }}
+              source={require("../../../../assets/videocall.png")}
             />
           </TouchableOpacity>
         </View>
@@ -107,12 +112,6 @@ const ConvoScreen = (props) => {
   // For Caller
   const videoCall = () => {
     console.log("Video Call");
-    // props.navigation.navigate("VideoChat", {
-    //   callType: "video",
-    //   caller: auth?.currentUser?.uid,
-    //   callee: props.route.params.uid,
-    // });
-
     initiateAVCall(
       {
         participants: [
@@ -134,12 +133,6 @@ const ConvoScreen = (props) => {
   // For Caller
   const audioCall = async () => {
     console.log("Audio Call");
-    // props.navigation.navigate("AudioChat", {
-    //   callType: "audio",
-    //   caller: auth?.currentUser?.uid,
-    //   callee: props.route.params.uid,
-    // });
-
     initiateAVCall(
       {
         participants: [
@@ -170,23 +163,33 @@ const ConvoScreen = (props) => {
 
   const sendMessage = async () => {
     if (msg !== "") {
+      let currMsg = msg;
+      setMsg("");
       Keyboard.dismiss();
       const currentTime = firestore.FieldValue.serverTimestamp();
       const msgRef = db.collection("messages").doc(chatID());
 
       await msgRef.collection("chats").add({
         timeStamp: currentTime,
-        message: msg,
+        message: currMsg,
         senderID: auth?.currentUser?.uid,
         recieverID: props.route.params.uid,
       });
-      setMsg("");
 
       await db
         .collection("Chats")
         .doc(props.route.params.uid)
         .collection("SelectedChats")
         .doc(auth?.currentUser?.uid)
+        .update({
+          lastMessageTime: currentTime,
+        });
+
+      await db
+        .collection("Chats")
+        .doc(auth?.currentUser?.uid)
+        .collection("SelectedChats")
+        .doc(props.route.params.uid)
         .update({
           lastMessageTime: currentTime,
         });
@@ -235,7 +238,7 @@ const ConvoScreen = (props) => {
                         source={{
                           uri:
                             auth?.currentUser?.photoURL ||
-                            "https://cdn.britannica.com/56/199056-050-CCC44482/Jeff-Bezos-2017.jpg",
+                            "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg",
                         }}
                       />
                       <Text style={styles.senderText}>{item.data.message}</Text>
@@ -253,7 +256,7 @@ const ConvoScreen = (props) => {
                         source={{
                           uri:
                             props.route.params.photo ||
-                            "https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg",
+                            "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg",
                         }}
                       />
                       <Text style={styles.recieverText}>
@@ -275,9 +278,10 @@ const ConvoScreen = (props) => {
               <TouchableOpacity onPress={sendMessage} activeOpacity={0.5}>
                 <Avatar
                   rounded
-                  source={{
-                    uri: "https://image.flaticon.com/icons/png/512/3682/3682321.png",
-                  }}
+                  // source={{
+                  //   uri: "https://image.flaticon.com/icons/png/512/3682/3682321.png",
+                  // }}
+                  source={require("../../../../assets/MessageSend.png")}
                 />
               </TouchableOpacity>
             </View>

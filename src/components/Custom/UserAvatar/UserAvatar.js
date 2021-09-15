@@ -36,10 +36,10 @@ const UserAvatar = (props) => {
   const actionSheet = useRef(null);
 
   const handleProfilePictureClick = () => {
-    if (image === baseAvatar) {
+    if (image === baseAvatar && !props.drawer) {
       console.log("Image Selector Opened");
       showActionSheet();
-    } else {
+    } else if (image !== baseAvatar) {
       const imageView = [
         {
           uri: image,

@@ -39,6 +39,7 @@ export const retrievePersistedAuthUser = () => {
   return new Promise((resolve) => {
     return auth.onAuthStateChanged((user) => {
       if (user) {
+        //console.log("LOGIN USER", user);
         return handleUserFromAuthStateChanged(user, resolve);
       } else {
         return tryAlternatePersistedAuthUserRetriever(resolve);
@@ -188,11 +189,13 @@ export const loginWithEmailAndPassword = async (email, password) => {
       .signInWithEmailAndPassword(email, password)
       .then((response) => {
         const uid = response.user.uid;
+        const emailVerified = response.user.emailVerified;
 
         const userData = {
           email,
           password,
           id: uid,
+          emailVerified,
         };
         usersRef
           .doc(uid)

@@ -48,6 +48,7 @@ const Signup = (props) => {
           displayName: values.fname,
           //photoURL: photoUrl,
         });
+        authUser.user.sendEmailVerification();
         db.collection("Users")
           .doc(authUser.user.uid)
           .set({
@@ -83,6 +84,28 @@ const Signup = (props) => {
                 },
               ],
             });
+          } else {
+            setLoading(false);
+
+            if (res.verification) {
+              Alert.alert(
+                "",
+                "Check your email to activate your account",
+                ["OK"],
+                {
+                  cancelable: false,
+                }
+              );
+              props.navigation.goBack();
+            } else {
+              Alert.alert(
+                "",
+                "An Error came while Signing up. Try Again!"["OK"],
+                {
+                  cancelable: false,
+                }
+              );
+            }
           }
         });
       })
@@ -96,7 +119,7 @@ const Signup = (props) => {
           console.log("That email address is invalid!");
         }
 
-        console.error(error);
+        console.error("Signup Error", error);
       });
     //actions.resetForm();
   };

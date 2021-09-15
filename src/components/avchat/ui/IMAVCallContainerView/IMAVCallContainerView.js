@@ -59,6 +59,10 @@ const IMAVCallContainerView = (props) => {
   // const twilioVideoRef = useRef();
   // const [twilioVideoTracks, setTwilioVideoTracks] = useState(new Map());
 
+  // useEffect(() => {
+  //   tearDownActiveCallSession();
+  // });
+
   useEffect(() => {
     fetch(`${API_URL}`)
       .then((res) => res.json())
@@ -66,6 +70,9 @@ const IMAVCallContainerView = (props) => {
         const value = { iceServers: data.iceServers };
         console.log("NTS TOKEN", value);
         setNTStoken(value);
+      })
+      .catch((err) => {
+        console.log("NTS FETCH ERROR", err);
       });
     // if (currentUser?.user) {
     // }

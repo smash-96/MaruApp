@@ -35,6 +35,7 @@ import {
 } from "../../../slices/helpRequestSlice";
 import uuid from "react-native-uuid";
 import haversine from "haversine";
+import TNActivityIndicator from "../../Custom/TNActivityIndicator/TNActivityIndicator";
 
 const { width, height } = Dimensions.get("window");
 
@@ -57,12 +58,10 @@ const MapScreen = () => {
   const [giveHelp, setGiveHelp] = useState(true);
   const [helpeeModalOpen, setHelpeeModalOpen] = useState(false);
   const [helperModalOpen, setHelperModalOpen] = useState(false);
-
   const [tracking, setTracking] = useState(false);
-
   const [helperModalData, setHelperModalData] = useState(null);
-
   const [refresh, doRefresh] = useState(0); // To trigger function in Map(child)
+  const [loading, setLoading] = useState(false);
 
   const navigation = useNavigation();
   const [t_id, setT_id] = useState(null);
@@ -368,6 +367,7 @@ const MapScreen = () => {
   };
 
   const enterChat = async () => {
+    setLoading(true);
     const docData = await db.collection("Users").doc(t_id).get();
     if (docData) {
       navigation.navigate("Messages", {
@@ -394,16 +394,16 @@ const MapScreen = () => {
     }
   };
 
-  const startNavigation = async () => {
-    console.log("Start Navigation");
+  // const startNavigation = async () => {
+  //   console.log("Start Navigation");
 
-    if (!tracking) {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setTracking(true);
-    } else {
-      setTracking(false);
-    }
-  };
+  //   if (!tracking) {
+  //     await new Promise((resolve) => setTimeout(resolve, 2000));
+  //     setTracking(true);
+  //   } else {
+  //     setTracking(false);
+  //   }
+  // };
 
   return (
     <View>
@@ -578,6 +578,7 @@ const MapScreen = () => {
           <View></View>
         )}
       </View>
+      {loading && <TNActivityIndicator />}
     </View>
   );
 };

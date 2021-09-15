@@ -59,7 +59,10 @@ export const CustomList = (props) => {
         <ListItem.Subtitle
           numberOfLines={1}
           ellipsizeMode="tail"
-          style={{ fontWeight: "bold", color: "black" }}
+          style={{
+            //fontWeight: "bold",
+            color: "black",
+          }}
         >
           {messages?.[0]?.data.message}
         </ListItem.Subtitle>

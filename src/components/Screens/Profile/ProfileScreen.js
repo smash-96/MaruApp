@@ -282,6 +282,13 @@ const ProfileScreen = (props) => {
 
           auth.currentUser.updateProfile({ photoURL: photoUrl });
         }
+      } else {
+        cRef.update({
+          photoUrl: baseAvatar,
+        });
+        dispatch(setUserPhoto(baseAvatar));
+
+        auth.currentUser.updateProfile({ photoURL: baseAvatar });
       }
 
       if (checkProfileComplete() === true) {

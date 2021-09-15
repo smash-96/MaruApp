@@ -7,6 +7,7 @@ import {
   Alert,
   AppState,
   Keyboard,
+  Platform,
 } from "react-native";
 import Authentication_Button from "../../Custom/AuthenticationButton";
 import { SocialIcon } from "react-native-elements";
@@ -32,6 +33,7 @@ import {
 import { setUserData, selectUserData } from "../../../slices/userAuthSlice";
 import { setActiveRequestData } from "../../../slices/helpRequestSlice";
 import { showMessage, hideMessage } from "react-native-flash-message";
+import { activateKeepAwake, deactivateKeepAwake } from "expo-keep-awake";
 
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -62,6 +64,13 @@ const Login = (props) => {
 
   const handleAppStateChange = async (nextAppState) => {
     console.log("handleAppStateChange", nextAppState);
+    // if (Platform.OS === "android") {
+    //   if (nextAppState === "background") {
+    //     deactivateKeepAwake();
+    //   } else {
+    //     activateKeepAwake();
+    //   }
+    // }
     const intialNotification = await messaging().getInitialNotification();
 
     if (intialNotification && Platform.OS === "android") {
@@ -181,7 +190,8 @@ const Login = (props) => {
       //   const userID = currentUser?.id || currentUser?.userID;
       //   updateUser(userID, { badgeCount: 0 });
       // }
-      if (remoteMessage) {
+      if (remoteMessage && remoteMessage.data.type === "message") {
+        console.log("remoteMessage.data.type", remoteMessage.data.type);
         showMessage({
           message: remoteMessage.data.fname,
           type: "message",
@@ -199,65 +209,77 @@ const Login = (props) => {
       .then(async (response) => {
         if (response?.user) {
           const user = response.user;
+          if (!user.emailVerified) {
+            const requestID = (
+              await db.collection("Users").doc(user.uid).get()
+            ).data().helpRequestID;
+            if (requestID !== null) {
+              const requestData = (
+                await db.collection("requests").doc(requestID).get()
+              ).data();
+              dispatch(setActiveRequestData(requestData));
+            } else {
+              dispatch(setActiveRequestData(null));
+            }
 
-          const requestID = (
-            await db.collection("Users").doc(user.uid).get()
-          ).data().helpRequestID;
-          if (requestID !== null) {
-            const requestData = (
-              await db.collection("requests").doc(requestID).get()
-            ).data();
-            dispatch(setActiveRequestData(requestData));
+            // delete user["createdAt"];
+            // delete user["lastOnlineTimestamp"];
+            //console.log("USER_NEW", user);
+            dispatch(setUserData({ user }));
+            //
+            if (user.photoUrl) {
+              dispatch(setUserPhoto(user.photoUrl));
+            }
+            if (user.userType) {
+              dispatch(setUserType(user.userType));
+            } else {
+              dispatch(setUserType(""));
+            }
+            if (user.Gender) {
+              dispatch(setUserGender(user.Gender));
+            } else {
+              dispatch(setUserGender(""));
+            }
+
+            if (user.fname) {
+              dispatch(setUserFname(user.fname));
+            }
+            if (user.lname) {
+              dispatch(setUserLname(user.lname));
+            }
+            if (user.email) {
+              dispatch(setUserEmail(user.email));
+            }
+            if (user.Address) {
+              dispatch(setUserAddress(user.Address));
+            }
+
+            if (user.Age) {
+              dispatch(setUserAge(user.Age));
+            }
+            //
+            Keyboard.dismiss();
+            props.navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: "MapStack",
+                  //params: { user: user }
+                },
+              ],
+            });
           } else {
-            dispatch(setActiveRequestData(null));
-          }
-
-          // delete user["createdAt"];
-          // delete user["lastOnlineTimestamp"];
-          //console.log("USER_NEW", user);
-          dispatch(setUserData({ user }));
-          //
-          if (user.photoUrl) {
-            dispatch(setUserPhoto(user.photoUrl));
-          }
-          if (user.userType) {
-            dispatch(setUserType(user.userType));
-          } else {
-            dispatch(setUserType(""));
-          }
-          if (user.Gender) {
-            dispatch(setUserGender(user.Gender));
-          } else {
-            dispatch(setUserGender(""));
-          }
-
-          if (user.fname) {
-            dispatch(setUserFname(user.fname));
-          }
-          if (user.lname) {
-            dispatch(setUserLname(user.lname));
-          }
-          if (user.email) {
-            dispatch(setUserEmail(user.email));
-          }
-          if (user.Address) {
-            dispatch(setUserAddress(user.Address));
-          }
-
-          if (user.Age) {
-            dispatch(setUserAge(user.Age));
-          }
-          //
-          Keyboard.dismiss();
-          props.navigation.reset({
-            index: 0,
-            routes: [
+            auth.signOut();
+            setLoading(false);
+            Alert.alert(
+              "Email not verified",
+              "Varify your email to access the app.",
+              ["OK"],
               {
-                name: "MapStack",
-                //params: { user: user }
-              },
-            ],
-          });
+                cancelable: false,
+              }
+            );
+          }
         } else {
           setLoading(false);
           Alert.alert("", response.error, [{ text: "OK" }], {
@@ -383,12 +405,12 @@ const Login = (props) => {
           <Text>{I18n.t("login.atext")} </Text>
 
           {/* Google logo for sign in */}
-          <SocialIcon
+          {/* <SocialIcon
             raised={true}
             type="google"
             style={{ backgroundColor: "#2c88d1" }}
             onPress={googleLogin}
-          />
+          /> */}
         </Content>
       </Container>
       {loading && <TNActivityIndicator />}

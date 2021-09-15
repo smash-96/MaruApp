@@ -394,9 +394,10 @@ const loginOrSignUpWithGoogle = () => {
 
 const handleSuccessfulSignup = (user, accountCreated) => {
   return new Promise(function (resolve, _reject) {
-    handleSuccessfulLogin(user, accountCreated).then((response) => {
-      resolve(response);
-    });
+    // handleSuccessfulLogin(user, accountCreated).then((response) => {
+    //   resolve(response);
+    // });
+    resolve({ verification: true });
   });
 };
 const handleSuccessfulLogin = (user, accountCreated) => {

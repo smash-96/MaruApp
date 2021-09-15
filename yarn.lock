@@ -1561,6 +1561,11 @@
   resolved "https://registry.yarnpkg.com/@react-native-community/masked-view/-/masked-view-0.1.11.tgz#2f4c6e10bee0786abff4604e39a37ded6f3980ce"
   integrity sha512-rQfMIGSR/1r/SyN87+VD8xHHzDYeHaJq6elOSCAD+0iLagXkSI2pfA0LmSXP21uw5i3em7GkkRjfJ8wpqWXZNw==
 
+"@react-native-community/netinfo@^6.0.2":
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/@react-native-community/netinfo/-/netinfo-6.0.2.tgz#3b61757c46d0f387815d42b651bbee1eb998a385"
+  integrity sha512-HbVIv6p+VAzSqALkfKKNbtSy0TneL7EILIqxiOjt/5weVdTuZ88NRyPNQAZBh6W8QYirXJo3f00ryMk9iLs7gQ==
+
 "@react-native-firebase/app@^12.1.0":
   version "12.7.5"
   resolved "https://registry.yarnpkg.com/@react-native-firebase/app/-/app-12.7.5.tgz#337fd517a6329dd9d734b36ca91bf0c54cc3a337"
@@ -3104,7 +3109,7 @@ expo-image-loader@~2.2.0:
   resolved "https://registry.yarnpkg.com/expo-image-loader/-/expo-image-loader-2.2.0.tgz#b5d49ec65e576c033823050b223ef462c5ec5711"
   integrity sha512-kTs/lW8LUXYFQ5t8wkdJs0A41zd7dIB8uRRC0a9L0EurSGUvQWiVTbHQoLo/GYWL7nM85OaPAe2qkHfcz5KeyA==
 
-expo-keep-awake@~9.2.0:
+expo-keep-awake@^9.2.0, expo-keep-awake@~9.2.0:
   version "9.2.0"
   resolved "https://registry.yarnpkg.com/expo-keep-awake/-/expo-keep-awake-9.2.0.tgz#9cbdcc8264c943ef29a58326236cd34267e98f43"
   integrity sha512-R5jAx5j3MqrhKFB307FBpaHtYSYeVIFX/rVforBF5inKonYjXRWVhjGoBjolF4geAryNamC3NKhMfxyaaB0W6Q==

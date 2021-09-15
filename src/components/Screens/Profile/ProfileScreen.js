@@ -443,16 +443,24 @@ const ProfileScreen = (props) => {
               <ActivityIndicator size="large" color="#0000ff" />
             </View>
           ) : (
-            <Button
-              containerStyle={{
-                margin: "10%",
-
-                borderRadius: 12,
-                width: "30%",
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
               }}
-              title={I18n.t("profile.button")}
-              onPress={submit}
-            />
+            >
+              <Button
+                containerStyle={{
+                  margin: "10%",
+
+                  // borderRadius: 120,
+                  // borderRadius: 70,
+                  width: "30%",
+                }}
+                title={I18n.t("profile.button")}
+                onPress={submit}
+              />
+            </View>
           )}
         </View>
       </View>

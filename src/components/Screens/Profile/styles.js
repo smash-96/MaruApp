@@ -43,6 +43,12 @@ const dynamic_styles = () => {
       color: "#1998ff",
       fontSize: 20,
     },
+    dob: {
+      fontSize: 18,
+      margin: 10,
+      textAlign: "right",
+      color: "black",
+    },
   });
 };
 

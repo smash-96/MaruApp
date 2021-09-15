@@ -88,7 +88,7 @@ function CustomDrawerContent(props) {
 
           <DrawerItemList {...props} />
           <DrawerItem
-            label="Logout"
+            label=" Logout"
             onPress={logout}
             icon={({ focused, size }) => (
               <Icon
@@ -125,7 +125,15 @@ const MapStack = (props) => {
         options={{
           unmountOnBlur: true,
           drawerLabel: ({ focused, size }) => (
-            <Text style={{ fontSize: 20, color: "black" }}>Profile</Text>
+            <Text
+              style={{
+                fontSize: 20,
+                color: "black",
+              }}
+            >
+              {"  "}
+              Profile
+            </Text>
           ),
           drawerActiveTintColor: "#2c88d1",
           drawerIcon: ({ focused, size }) => (
@@ -144,7 +152,7 @@ const MapStack = (props) => {
         options={{
           headerShown: false,
           drawerLabel: ({ focused, size }) => (
-            <Text style={{ fontSize: 20, color: "black" }}>Map</Text>
+            <Text style={{ fontSize: 20, color: "black" }}>{"  "}Map</Text>
           ),
           drawerActiveTintColor: "#2c88d1",
           drawerIcon: ({ focused, size }) => (
@@ -169,7 +177,7 @@ const MapStack = (props) => {
           drawerActiveTintColor: "#2c88d1",
           drawerIcon: ({ focused, size }) => (
             <Icon
-              name="user-friends"
+              name="rocketchat"
               type="font-awesome-5"
               size={size}
               color={focused ? "#2c88d1" : "#ccc"}

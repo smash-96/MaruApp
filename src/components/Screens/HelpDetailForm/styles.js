@@ -39,7 +39,7 @@ const dynamicStyles = () => {
       marginTop: 15,
     },
     modalView: {
-      width: "85%",
+      width: "80%",
       backgroundColor: "white",
       borderRadius: 20,
       padding: 35,
@@ -74,7 +74,7 @@ const dynamicStyles = () => {
     modalText: {
       marginBottom: 15,
       textAlign: "center",
-      fontSize: 14,
+      fontSize: 16,
     },
     Detailsinput: {
       borderWidth: 1.5,
@@ -82,7 +82,7 @@ const dynamicStyles = () => {
       padding: 10,
 
       textAlignVertical: "top",
-      fontSize: 20,
+      fontSize: 16,
       marginBottom: 10,
     },
     input: {
@@ -91,7 +91,7 @@ const dynamicStyles = () => {
       padding: 10,
       paddingTop: 0,
       paddingBottom: 0,
-      fontSize: 20,
+      fontSize: 16,
       marginBottom: 10,
     },
   });

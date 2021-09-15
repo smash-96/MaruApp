@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import {
   StyleSheet,
   View,
-  Button,
+  // Button,
   Alert,
   TouchableOpacity,
   Dimensions,
   Modal,
   Image,
+  Pressable,
+  Text,
 } from "react-native";
 import { Avatar, Icon } from "react-native-elements";
 import { auth, db } from "../../../firebase/firebaseConfig";
@@ -18,6 +20,7 @@ import tw from "tailwind-react-native-classnames";
 import { useNavigation } from "@react-navigation/native";
 import Map from "../../Custom/Map";
 import { useSelector, useDispatch } from "react-redux";
+import { Button } from "react-native-elements";
 import {
   selectUserType,
   selectUserLocation,
@@ -405,7 +408,17 @@ const MapScreen = () => {
   return (
     <View>
       <Modal transparent={true} visible={helpeeModalOpen}>
-        <View>
+        <View
+          style={{
+            marginTop: 50,
+            // flex: 1,
+            justifyContent: "center",
+            // alignSelf: "center",
+            // marginBottom: "80%",
+            // justifyContent: "center",
+            // alignItems: "center",
+          }}
+        >
           <HelpForm
             onSubmit={(request) => broadcastRequest(request)}
             onClose={() => setHelpeeModalOpen(false)}
@@ -413,7 +426,13 @@ const MapScreen = () => {
         </View>
       </Modal>
       <Modal transparent={true} visible={helperModalOpen}>
-        <View>
+        <View
+          style={{
+            marginTop: 50,
+            // flex: 1,
+            justifyContent: "center",
+          }}
+        >
           <HelpForm
             onSubmit={acceptRequest}
             onClose={() => {
@@ -437,32 +456,92 @@ const MapScreen = () => {
       <TouchableOpacity
         style={{
           position: "absolute",
-          top: 0,
-          right: 0,
+          // alignSelf: "flex-end",
+          bottom: 30,
+          right: 20,
         }}
         onPress={() => doRefresh((prev) => prev + 1)}
       >
-        <Image source={require("../../../assets/greenIndicator.png")} />
+        <Image
+          source={require("../../../assets/Current_Location.jpg")}
+          style={{ height: 30, width: 30 }}
+        />
       </TouchableOpacity>
 
       <View
         style={{
           position: "absolute", //use absolute position to show button on top of the map
-          bottom: 10,
+          bottom: 20,
           alignItems: "center",
           width: "100%",
         }}
       >
         {userType !== "helper" ? (
-          <Button
-            title={needHelp === true ? "Need Help?" : "Cancel Request"}
+          <TouchableOpacity
+            activeOpacity={0.825}
+            style={{
+              backgroundColor: "#2b88d1",
+              borderColor: "#2b88d1",
+              borderWidth: 20,
+              borderRadius: 20,
+            }}
             onPress={helpeeAction}
-          />
+          >
+            <View style={{ borderRadius: 0, borderWidth: 0 }}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "bold",
+                  fontFamily: "verdana",
+                  color: "white",
+                  borderRadius: 0,
+                  borderWidth: 0,
+                }}
+              >
+                {needHelp === true ? "Need Help?" : "Cancel Request"}
+              </Text>
+            </View>
+          </TouchableOpacity>
         ) : (
-          <Button
-            title={giveHelp === true ? "Give Help?" : "Cancel Help"}
+          //  <Button
+          //   title={needHelp === true ? "Need Help?" : "Cancel Request"}
+          //   onPress={helpeeAction}
+          //   // containerStyle={{
+          //   //   borderRadius: 30,
+          //   //   borderWidth: 10,
+          //   //   borderColor: "#2289dc",
+          //   // }}
+          // />
+          // <Button
+          //   title={giveHelp === true ? "Give Help?" : "Cancel Help"}
+          //   onPress={helperAction}
+          //   style={{ borderColor: "red", borderWidth: 23 }}
+          // />
+          <TouchableOpacity
+            activeOpacity={0.825}
+            style={{
+              backgroundColor: "#2b88d1",
+              borderColor: "#2b88d1",
+              borderWidth: 20,
+              borderRadius: 20,
+            }}
             onPress={helperAction}
-          />
+          >
+            <View style={{ borderRadius: 0, borderWidth: 0 }}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "bold",
+                  fontFamily: "verdana",
+                  color: "white",
+                  borderRadius: 0,
+                  borderWidth: 0,
+                }}
+              >
+                {giveHelp === true ? "Give Help?" : "Cancel Help"}
+              </Text>
+            </View>
+          </TouchableOpacity>
         )}
         {/* {helperLocation && helpeeLocation && userType === "helper" && (
           <Button
@@ -483,7 +562,7 @@ const MapScreen = () => {
             onPress={enterChat}
             style={{
               alignSelf: "flex-end",
-              bottom: 50,
+              bottom: 80,
               right: 20,
             }}
           >

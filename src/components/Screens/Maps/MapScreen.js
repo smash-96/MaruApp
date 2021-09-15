@@ -45,9 +45,9 @@ const LONGITUDE = 74.34618461877108;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const DEFAULT_PADDING = { top: 40, right: 40, bottom: 120, left: 40 };
-const userID = auth?.currentUser?.uid;
+//const userID = auth?.currentUser?.uid;
 
-const MapScreen = () => {
+const MapScreen = (props) => {
   const dispatch = useDispatch();
   const userType = useSelector(selectUserType);
   const helpeeLocation = useSelector(selectHelpeeLocation);
@@ -67,21 +67,23 @@ const MapScreen = () => {
   const [t_id, setT_id] = useState(null);
 
   useLayoutEffect(() => {
-    if (activeRequestData) {
-      if (activeRequestData.status === "open" && userType === "helpee") {
-        setNeedHelp(false);
-      } else if (activeRequestData.status === "InProgress") {
-        if (userType === "helper") {
-          setT_id(activeRequestData.helpeeID); // set helpee ID for helper to delete
+    return () => {
+      if (activeRequestData) {
+        if (activeRequestData.status === "open" && userType === "helpee") {
           setNeedHelp(false);
-          setGiveHelp(false);
+        } else if (activeRequestData.status === "InProgress") {
+          if (userType === "helper") {
+            setT_id(activeRequestData.helpeeID); // set helpee ID for helper to delete
+            setNeedHelp(false);
+            setGiveHelp(false);
 
-          dispatch(setHelpeeLocation(activeRequestData.locationHelpee));
-        } else {
-          setNeedHelp(false);
+            dispatch(setHelpeeLocation(activeRequestData.locationHelpee));
+          } else {
+            setNeedHelp(false);
+          }
         }
       }
-    }
+    };
   }, []);
 
   useEffect(() => {
@@ -97,6 +99,7 @@ const MapScreen = () => {
   });
 
   useEffect(() => {
+    const userID = props.route.params.user.uid;
     const cRef = db.collection("requests").doc(userID);
 
     const unsubscribe = cRef.onSnapshot(async (snapshot) => {
@@ -145,6 +148,8 @@ const MapScreen = () => {
   // });
 
   const broadcastRequest = async (request) => {
+    const userID = props.route.params.user.uid;
+    const { subject, details, time } = request;
     const requestData = {
       helpeeID: userID,
       helperID: null,
@@ -156,12 +161,12 @@ const MapScreen = () => {
     const cRef = db.collection("requests").doc(userID);
     cRef.set({
       helpeeID: userID,
-      subject: request.subject || "NA",
-      details: request.details || "NA",
+      subject: subject || "NA",
+      details: details || "NA",
       status: "open",
       locationHelpee: helpeeLocation,
       //locationHelpee: simulatedGetMapRegion(),
-      ttl: request.time || "NA", // How soon does the helpee need help. E.g: within an hour
+      ttl: time || "NA", // How soon does the helpee need help. E.g: within an hour
       timeStamp: firestore.FieldValue.serverTimestamp(),
     });
     db.collection("Users").doc(userID).update({
@@ -190,8 +195,8 @@ const MapScreen = () => {
   const helperAction = async () => {
     console.log("Give Help?");
     if (giveHelp === true) {
-      const requests = await db.collection("requests");
-      requests
+      const requests = db.collection("requests");
+      await requests
         .get()
         .then((querySnapshot) => {
           const tempDoc = [];
@@ -259,6 +264,7 @@ const MapScreen = () => {
   };
 
   const acceptRequest = async () => {
+    const userID = props.route.params.user.uid;
     const requestData = {
       helpeeID: helperModalData.helpeeID,
       helperID: userID,
@@ -334,6 +340,7 @@ const MapScreen = () => {
   };
 
   const firestoreCleanUp = async () => {
+    const userID = props.route.params.user.uid;
     let cRef;
     //cRef = db.collection("requests").doc(t_id);
     if (userType === "helper") {
@@ -367,6 +374,7 @@ const MapScreen = () => {
   };
 
   const enterChat = async () => {
+    const userID = props.route.params.user.uid;
     setLoading(true);
     const docData = await db.collection("Users").doc(t_id).get();
     if (docData) {
@@ -411,12 +419,7 @@ const MapScreen = () => {
         <View
           style={{
             marginTop: 50,
-            // flex: 1,
             justifyContent: "center",
-            // alignSelf: "center",
-            // marginBottom: "80%",
-            // justifyContent: "center",
-            // alignItems: "center",
           }}
         >
           <HelpForm

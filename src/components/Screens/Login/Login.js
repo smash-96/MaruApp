@@ -33,8 +33,8 @@ import {
 import { setUserData, selectUserData } from "../../../slices/userAuthSlice";
 import { setActiveRequestData } from "../../../slices/helpRequestSlice";
 import { showMessage, hideMessage } from "react-native-flash-message";
-import { activateKeepAwake, deactivateKeepAwake } from "expo-keep-awake";
-
+//import { activateKeepAwake, deactivateKeepAwake } from "expo-keep-awake";
+import { useNavigation } from "@react-navigation/native";
 import { Formik } from "formik";
 import * as yup from "yup";
 
@@ -54,6 +54,7 @@ const Login = (props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   // New code
   useEffect(() => {
@@ -152,7 +153,7 @@ const Login = (props) => {
             routes: [
               {
                 name: "MapStack",
-                //params: { user: user }
+                params: { user: user },
               },
             ],
           });
@@ -191,10 +192,16 @@ const Login = (props) => {
       //   updateUser(userID, { badgeCount: 0 });
       // }
       if (remoteMessage && remoteMessage.data.type === "message") {
-        console.log("remoteMessage.data.type", remoteMessage.data.type);
+        // console.log(
+        //   "current navigation route",
+        //   navigation.getState().routeNames
+        // );
         showMessage({
           message: remoteMessage.data.fname,
-          type: "message",
+          description: remoteMessage.data.userMsg,
+          type: "default",
+          backgroundColor: "white", // background color
+          color: "black", // text color
         });
       }
     });
@@ -264,7 +271,7 @@ const Login = (props) => {
               routes: [
                 {
                   name: "MapStack",
-                  //params: { user: user }
+                  params: { user: user },
                 },
               ],
             });
@@ -401,8 +408,8 @@ const Login = (props) => {
             />
           </View>
 
-          <Text>- {I18n.t("login.or")} -</Text>
-          <Text>{I18n.t("login.atext")} </Text>
+          {/* <Text>- {I18n.t("login.or")} -</Text>
+          <Text>{I18n.t("login.atext")} </Text> */}
 
           {/* Google logo for sign in */}
           {/* <SocialIcon

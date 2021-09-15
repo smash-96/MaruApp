@@ -33,11 +33,11 @@ const HelpForm = (props) => {
   const baseAvatar =
     "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg";
 
-  const [helpeeName, setHelpeeName] = useState(null);
+  const [helpeeName, setHelpeeName] = useState("");
   const [helpeePhoto, setHelpeePhoto] = useState(baseAvatar || "");
-  const [helpeeSubject, setHelpeeSubject] = useState(null);
-  const [helpeeDetails, setHelpeeDetails] = useState(null);
-  const [helpeeTime, setHelpeeTime] = useState(null);
+  const [helpeeSubject, setHelpeeSubject] = useState("");
+  const [helpeeDetails, setHelpeeDetails] = useState("");
+  const [helpeeTime, setHelpeeTime] = useState("");
 
   if (userType === "helpee") {
     return (

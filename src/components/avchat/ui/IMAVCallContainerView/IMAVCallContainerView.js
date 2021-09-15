@@ -36,6 +36,18 @@ import IMAVActiveAudioCallView from "../IMAVActiveAudioCallView/IMAVActiveAudioC
 const API_URL =
   "https://us-central1-volunteerteam-1c46b.cloudfunctions.net/getNTSToken?data=token";
 
+const servers = {
+  iceServers: [
+    { urls: "stun:stun.services.mozilla.com" },
+    { urls: "stun:stun.l.google.com:19302" },
+    {
+      urls: "turn:numb.viagenie.ca",
+      credential: "beaver",
+      username: "webrtc.websitebeaver@gmail.com",
+    },
+  ],
+};
+
 const IMAVCallContainerView = (props) => {
   const { store } = useContext(ReactReduxContext);
   const dispatch = useDispatch();
@@ -64,19 +76,20 @@ const IMAVCallContainerView = (props) => {
   // });
 
   useEffect(() => {
-    fetch(`${API_URL}`)
-      .then((res) => res.json())
-      .then((data) => {
-        const value = { iceServers: data.iceServers };
-        console.log("NTS TOKEN", value);
-        setNTStoken(value);
-      })
-      .catch((err) => {
-        console.log("NTS FETCH ERROR", err);
-      });
-    // if (currentUser?.user) {
-    // }
-  }, []);
+    if (currentUser?.user) {
+      fetch(`${API_URL}`)
+        .then((res) => res.json())
+        .then((data) => {
+          const value = { iceServers: data.iceServers };
+          console.log("NTS TOKEN", value);
+          setNTStoken(value);
+        })
+        .catch((err) => {
+          console.log("NTS FETCH ERROR", err);
+          setNTStoken(servers);
+        });
+    }
+  }, [currentUser?.user]);
 
   useEffect(() => {
     if (currentUser?.user.uid) {

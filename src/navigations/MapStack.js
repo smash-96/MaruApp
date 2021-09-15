@@ -149,6 +149,7 @@ const MapStack = (props) => {
       <Drawer.Screen
         name="MapScreen"
         component={MapScreen}
+        initialParams={{ user: props.route.params.user }}
         options={{
           headerShown: false,
           drawerLabel: ({ focused, size }) => (

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Button } from "react-native";
+import { StyleSheet, Text, View, Modal } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
 
 const Network = () => {
@@ -23,9 +23,24 @@ const Network = () => {
     return null;
   }
   return (
-    <View style={{ flex: 1 }}>
-      <Text>Internet not avaialble!</Text>
-    </View>
+    <Modal
+      visible={true}
+      animationType={"fade"}
+      presentationStyle={"fullScreen"}
+    >
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text>
+          Internet not available. Connect to an available network to use the
+          app.
+        </Text>
+      </View>
+    </Modal>
   );
 };
 

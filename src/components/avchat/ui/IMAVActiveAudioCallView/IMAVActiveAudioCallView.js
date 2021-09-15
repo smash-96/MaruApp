@@ -82,7 +82,7 @@ const IMAVActiveAudioCallView = (props) => {
             source={{
               uri:
                 user.photoUrl ||
-                "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg",
+                "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
             }}
             style={styles.profilePicture}
           />
@@ -105,7 +105,7 @@ const IMAVActiveAudioCallView = (props) => {
       // source={{
       //   uri:
       //     otherParticipants[0]?.photoUrl ||
-      //     "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg",
+      //     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
       // }}
       source={assets.backgroudImage}
       style={styles.imageBackground}

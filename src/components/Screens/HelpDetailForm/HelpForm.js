@@ -9,6 +9,8 @@ import { selectUserType } from "../../../slices/userInfoSlice";
 import UserAvatar from "../../Custom/UserAvatar/UserAvatar";
 import dynamic_styles from "./styles";
 
+import I18n from "../../../localization/utils/language";
+
 const helpeeFieldsSchema = yup.object({
   //   title: yup.string().required().min(3),
   //   body: yup.string().required().min(8),
@@ -31,7 +33,7 @@ const HelpForm = (props) => {
   const styles = dynamic_styles();
   const userType = useSelector(selectUserType);
   const baseAvatar =
-    "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg";
+    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
 
   const [helpeeName, setHelpeeName] = useState("");
   const [helpeePhoto, setHelpeePhoto] = useState(baseAvatar || "");
@@ -49,36 +51,36 @@ const HelpForm = (props) => {
         >
           {(formikProps) => (
             <View style={styles.modalView}>
-              <Text style={styles.modalText}>Fill to get help</Text>
+              <Text style={styles.modalText}>{I18n.t("helpForm.heading")}</Text>
               <View>
                 <Text style={{ fontWeight: "bold", marginBottom: 4 }}>
-                  Subject
+                  {I18n.t("helpForm.subject")}
                 </Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Subject"
+                  placeholder={I18n.t("helpForm.subject")}
                   // automatically handles the state of the form
                   onChangeText={formikProps.handleChange("subject")}
                   value={formikProps.values.subject}
                 />
 
                 <Text style={{ fontWeight: "bold", marginBottom: 4 }}>
-                  Details
+                  {I18n.t("helpForm.details")}
                 </Text>
                 <TextInput
                   multiline
                   style={styles.Detailsinput}
-                  placeholder="Details"
+                  placeholder={I18n.t("helpForm.details")}
                   onChangeText={formikProps.handleChange("details")}
                   value={formikProps.values.details}
                 />
 
                 <Text style={{ fontWeight: "bold", marginBottom: 4 }}>
-                  Time
+                  {I18n.t("helpForm.time")}
                 </Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Time"
+                  placeholder={I18n.t("helpForm.time")}
                   onChangeText={formikProps.handleChange("time")}
                   value={formikProps.values.time}
                   keyboardType="numeric"
@@ -90,7 +92,9 @@ const HelpForm = (props) => {
                   style={[styles.button, styles.buttonSubmit]}
                   onPress={formikProps.handleSubmit}
                 >
-                  <Text style={styles.textStyle}>Submit</Text>
+                  <Text style={styles.textStyle}>
+                    {I18n.t("helpForm.submit")}
+                  </Text>
                 </Pressable>
               </View>
               <View style={{ marginTop: 10 }}>
@@ -98,7 +102,9 @@ const HelpForm = (props) => {
                   style={[styles.button, styles.buttonClose]}
                   onPress={props.onClose}
                 >
-                  <Text style={styles.textStyle}>Close</Text>
+                  <Text style={styles.textStyle}>
+                    {I18n.t("helpForm.close")}
+                  </Text>
                 </Pressable>
               </View>
             </View>

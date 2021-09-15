@@ -56,7 +56,7 @@ const ProfileScreen = (props) => {
   const activeRequestData = useSelector(selectActiveRequestData);
 
   const baseAvatar =
-    "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg";
+    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
   const [image, setImage] = useState(baseAvatar || "");
   const [profilePic, setProfilePic] = useState(baseAvatar || "");
   const [uploading, setUploading] = useState(false);
@@ -282,14 +282,15 @@ const ProfileScreen = (props) => {
 
           auth.currentUser.updateProfile({ photoURL: photoUrl });
         }
-      } else {
-        cRef.update({
-          photoUrl: baseAvatar,
-        });
-        dispatch(setUserPhoto(baseAvatar));
-
-        auth.currentUser.updateProfile({ photoURL: baseAvatar });
       }
+      // else if (image === baseAvatar) {
+      //   cRef.update({
+      //     photoUrl: baseAvatar,
+      //   });
+      //   dispatch(setUserPhoto(baseAvatar));
+
+      //   auth.currentUser.updateProfile({ photoURL: baseAvatar });
+      // }
 
       if (checkProfileComplete() === true) {
         setProfileLock(false);
@@ -305,8 +306,8 @@ const ProfileScreen = (props) => {
       );
     } else {
       Alert.alert(
-        "Request in progress",
-        "Kindly complete or cancel the help request to modify your profile"
+        I18n.t("profile.alert3.header"),
+        I18n.t("profile.alert3.text")
       );
     }
   };

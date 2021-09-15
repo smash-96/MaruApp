@@ -22,11 +22,12 @@ import ChatStack from "./ChatStack";
 import { auth } from "../firebase/firebaseConfig";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "react-native-elements";
+import I18n from "../localization/utils/language";
 function CustomDrawerContent(props) {
   const navigation = useNavigation();
   const userPhoto = useSelector(selectUserPhoto);
   const baseAvatar =
-    "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg";
+    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
   const [profilePic, setProfilePic] = useState(baseAvatar || "");
 
   const ripple = TouchableNativeFeedback.Ripple("#adacac", false);
@@ -72,7 +73,7 @@ function CustomDrawerContent(props) {
                   fontSize: 20,
                 }}
               >
-                Hello {auth?.currentUser?.displayName}
+                {I18n.t("drawer.hello")} {auth?.currentUser?.displayName}
               </Text>
               <Text
                 style={{
@@ -88,7 +89,7 @@ function CustomDrawerContent(props) {
 
           <DrawerItemList {...props} />
           <DrawerItem
-            label=" Logout"
+            label={I18n.t("drawer.logout")}
             onPress={logout}
             icon={({ focused, size }) => (
               <Icon
@@ -132,7 +133,7 @@ const MapStack = (props) => {
               }}
             >
               {"  "}
-              Profile
+              {I18n.t("drawer.profile")}
             </Text>
           ),
           drawerActiveTintColor: "#2c88d1",
@@ -153,7 +154,10 @@ const MapStack = (props) => {
         options={{
           headerShown: false,
           drawerLabel: ({ focused, size }) => (
-            <Text style={{ fontSize: 20, color: "black" }}>{"  "}Map</Text>
+            <Text style={{ fontSize: 20, color: "black" }}>
+              {"  "}
+              {I18n.t("drawer.map")}
+            </Text>
           ),
           drawerActiveTintColor: "#2c88d1",
           drawerIcon: ({ focused, size }) => (
@@ -173,7 +177,9 @@ const MapStack = (props) => {
         options={{
           headerShown: false,
           drawerLabel: ({ focused, size }) => (
-            <Text style={{ fontSize: 20, color: "black" }}>Connections</Text>
+            <Text style={{ fontSize: 20, color: "black" }}>
+              {I18n.t("drawer.chat")}
+            </Text>
           ),
           drawerActiveTintColor: "#2c88d1",
           drawerIcon: ({ focused, size }) => (

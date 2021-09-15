@@ -45,7 +45,7 @@ const ConvoScreen = (props) => {
             source={{
               uri:
                 props.route.params.photo ||
-                "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg",
+                "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
             }}
           />
           <Text
@@ -238,7 +238,7 @@ const ConvoScreen = (props) => {
                         source={{
                           uri:
                             auth?.currentUser?.photoURL ||
-                            "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg",
+                            "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
                         }}
                       />
                       <Text style={styles.senderText}>{item.data.message}</Text>
@@ -256,7 +256,7 @@ const ConvoScreen = (props) => {
                         source={{
                           uri:
                             props.route.params.photo ||
-                            "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg",
+                            "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
                         }}
                       />
                       <Text style={styles.recieverText}>

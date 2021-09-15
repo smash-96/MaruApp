@@ -89,9 +89,9 @@ const Signup = (props) => {
 
             if (res.verification) {
               Alert.alert(
-                "",
-                "Check your email to activate your account",
-                ["OK"],
+                I18n.t("signup.alert.header"),
+                I18n.t("signup.alert.body"),
+                [I18n.t("signup.alert.button")],
                 {
                   cancelable: false,
                 }
@@ -100,7 +100,8 @@ const Signup = (props) => {
             } else {
               Alert.alert(
                 "",
-                "An Error came while Signing up. Try Again!"["OK"],
+                I18n.t("signup.alert.error"),
+                [I18n.t("signup.alert.button")],
                 {
                   cancelable: false,
                 }

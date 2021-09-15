@@ -64,7 +64,7 @@ const signInWithCredential = (authManager, credential, appIdentifier) => {
           response.additionalUserInfo.profile;
         const { uid, email, phoneNumber, photoURL } = response.user;
         const defaultProfilePhotoURL =
-          "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg";
+          "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
 
         if (isNewUser) {
           //const timestamp = firebase.firestore.FieldValue.serverTimestamp();

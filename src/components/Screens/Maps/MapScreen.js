@@ -36,7 +36,7 @@ import {
 import uuid from "react-native-uuid";
 import haversine from "haversine";
 import TNActivityIndicator from "../../Custom/TNActivityIndicator/TNActivityIndicator";
-
+import I18n from "../../../localization/utils/language";
 const { width, height } = Dimensions.get("window");
 
 const ASPECT_RATIO = width / height;
@@ -84,7 +84,7 @@ const MapScreen = (props) => {
         }
       }
     };
-  }, []);
+  });
 
   useEffect(() => {
     const cRef = db.collection("requests");
@@ -172,10 +172,7 @@ const MapScreen = (props) => {
     db.collection("Users").doc(userID).update({
       helpRequestID: userID,
     });
-    Alert.alert(
-      "Request Sent!",
-      "Your request is broadcasted. We'll let you know if some one decides to aid you!"
-    );
+    Alert.alert(I18n.t("map.broadcast.header"), I18n.t("map.broadcast.body"));
     setNeedHelp(false);
     setHelpeeModalOpen(false);
   };
@@ -186,7 +183,7 @@ const MapScreen = (props) => {
       setHelpeeModalOpen(true);
     } else {
       // cancel button function
-      Alert.alert("Request Cancelled!", "You cancelled the request");
+      Alert.alert(I18n.t("map.cancel.header"), I18n.t("map.cancel.body"));
 
       clearRequest();
     }
@@ -237,26 +234,20 @@ const MapScreen = (props) => {
                 // }
               } else {
                 Alert.alert(
-                  "No Request Available",
-                  "No help request is available in the system right now."
+                  I18n.t("map.noReq.header"),
+                  I18n.t("map.noReq.body")
                 );
               }
             }
           } else {
-            Alert.alert(
-              "No Request Available",
-              "No help request is available in the system right now."
-            );
+            Alert.alert(I18n.t("map.noReq.header"), I18n.t("map.noReq.body"));
           }
         })
         .catch((err) => {
           console.log("Error", err);
         });
     } else {
-      Alert.alert(
-        "Request Cancelled",
-        "You have cancelled your request to help."
-      );
+      Alert.alert(I18n.t("map.noReq.header"), I18n.t("map.noReq.body"));
 
       // set for helper
       clearRequest();
@@ -501,7 +492,9 @@ const MapScreen = (props) => {
                   borderWidth: 0,
                 }}
               >
-                {needHelp === true ? "Need Help?" : "Cancel Request"}
+                {needHelp === true
+                  ? I18n.t("map.needHelp")
+                  : I18n.t("map.cancelHelp")}
               </Text>
             </View>
           </TouchableOpacity>
@@ -541,7 +534,9 @@ const MapScreen = (props) => {
                   borderWidth: 0,
                 }}
               >
-                {giveHelp === true ? "Give Help?" : "Cancel Help"}
+                {giveHelp === true
+                  ? I18n.t("map.giveHelp")
+                  : I18n.t("map.cancelHelp")}
               </Text>
             </View>
           </TouchableOpacity>

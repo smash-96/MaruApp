@@ -279,9 +279,9 @@ const Login = (props) => {
             auth.signOut();
             setLoading(false);
             Alert.alert(
-              "Email not verified",
-              "Varify your email to access the app.",
-              ["OK"],
+              I18n.t("login.alert.header"),
+              I18n.t("login.alert.body"),
+              [I18n.t("login.alert.button")],
               {
                 cancelable: false,
               }
@@ -289,7 +289,7 @@ const Login = (props) => {
           }
         } else {
           setLoading(false);
-          Alert.alert("", response.error, [{ text: "OK" }], {
+          Alert.alert("", response.error, [I18n.t("login.alert.button")], {
             cancelable: false,
           });
         }

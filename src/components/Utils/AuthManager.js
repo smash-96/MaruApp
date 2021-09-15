@@ -16,7 +16,7 @@ import {
 // import { IMLocalized } from '../../../../localization/IMLocalization';
 
 const defaultProfilePhotoURL =
-  "https://www.iosapptemplates.com/wp-content/uploads/2019/06/empty-avatar.jpg";
+  "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
 
 // const validateUsernameFieldIfNeeded = (inputFields, appConfig) => {
 //   return new Promise((resolve, reject) => {

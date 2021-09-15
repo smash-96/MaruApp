@@ -216,7 +216,7 @@ const Login = (props) => {
       .then(async (response) => {
         if (response?.user) {
           const user = response.user;
-          if (!user.emailVerified) {
+          if (user.emailVerified) {
             const requestID = (
               await db.collection("Users").doc(user.uid).get()
             ).data().helpRequestID;

@@ -216,7 +216,7 @@ const Login = (props) => {
       .then(async (response) => {
         if (response?.user) {
           const user = response.user;
-          if (user.emailVerified) {
+          if (!user.emailVerified) {
             const requestID = (
               await db.collection("Users").doc(user.uid).get()
             ).data().helpRequestID;
@@ -289,9 +289,15 @@ const Login = (props) => {
           }
         } else {
           setLoading(false);
-          Alert.alert("", response.error, [I18n.t("login.alert.button")], {
-            cancelable: false,
-          });
+          console.log("SOME ERROR");
+          Alert.alert(
+            I18n.t("login.alert2.header"),
+            I18n.t("login.alert2.body"),
+            [I18n.t("login.alert.button")],
+            {
+              cancelable: false,
+            }
+          );
         }
       });
 
@@ -398,14 +404,33 @@ const Login = (props) => {
             )}
           </Formik>
 
-          <View style={styles.authenticationButton}>
-            <Authentication_Button
+          <View>
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: "bold",
+              }}
+            >
+              {I18n.t("login.signupText")}
+              <Text
+                style={{
+                  // fontSize: 16,
+                  fontWeight: "bold",
+                  color: "blue",
+                }}
+                onPress={signup}
+              >
+                {" "}
+                {I18n.t("login.eText")}
+              </Text>
+            </Text>
+            {/* <Authentication_Button
               title={I18n.t("login.signup")}
               backGroundColor={"#FFFFFF"}
               textColor={"#2c88d1"}
               borderColor={"#2c88d1"}
               handlePress={signup}
-            />
+            /> */}
           </View>
 
           {/* <Text>- {I18n.t("login.or")} -</Text>

@@ -3,12 +3,17 @@ const en = {
     emailPlaceholder: "E-mail Address",
     passPlaceholder: "Password",
     login: "Login",
-    signup: "Signup",
-    or: "OR",
-    atext: "Sign in with",
+    signupText: "Don't have an account?",
+    //or: "OR",
+    eText: "Signup here!",
     alert: {
       header: "Email not verified",
       body: "Verify your email to access the app.",
+      button: "OK",
+    },
+    alert2: {
+      header: "Incorrect Credentials",
+      body: "Email or password is incorrect. Please enter the correct credentials.",
       button: "OK",
     },
   },
@@ -17,7 +22,8 @@ const en = {
     lnamePlaceholder: "Last Name",
     emailPlaceholder: "E-mail Address",
     passPlaceholder: "Password",
-    login: "Login",
+    login: "Already have an account?",
+    eText: "Login",
     signup: "Signup",
     alert: {
       header: "Activation email sent",
@@ -89,9 +95,9 @@ const en = {
     heading: "Fill to get help",
     subject: "Subject",
     details: "Details",
-    time: "time",
+    time: "Time",
     submit: "Submit",
-    close: "close",
+    close: "Close",
   },
 };
 export default en;

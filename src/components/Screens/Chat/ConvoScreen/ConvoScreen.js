@@ -176,23 +176,27 @@ const ConvoScreen = (props) => {
         recieverID: props.route.params.uid,
       });
 
-      await db
-        .collection("Chats")
-        .doc(props.route.params.uid)
-        .collection("SelectedChats")
-        .doc(auth?.currentUser?.uid)
-        .update({
-          lastMessageTime: currentTime,
-        });
+      try {
+        await db
+          .collection("Chats")
+          .doc(props.route.params.uid)
+          .collection("SelectedChats")
+          .doc(auth?.currentUser?.uid)
+          .update({
+            lastMessageTime: currentTime,
+          });
 
-      await db
-        .collection("Chats")
-        .doc(auth?.currentUser?.uid)
-        .collection("SelectedChats")
-        .doc(props.route.params.uid)
-        .update({
-          lastMessageTime: currentTime,
-        });
+        await db
+          .collection("Chats")
+          .doc(auth?.currentUser?.uid)
+          .collection("SelectedChats")
+          .doc(props.route.params.uid)
+          .update({
+            lastMessageTime: currentTime,
+          });
+      } catch (err) {
+        console.log("List not Created yet Error!");
+      }
     }
   };
 

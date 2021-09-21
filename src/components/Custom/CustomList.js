@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { ListItem, Avatar } from "react-native-elements";
 import { auth, db } from "../../firebase/firebaseConfig";
+import { Image } from "react-native";
+import axios from "axios";
 
 export const CustomList = (props) => {
   const [messages, setMessages] = useState([]);
@@ -49,7 +51,7 @@ export const CustomList = (props) => {
       <Avatar
         rounded
         source={{
-          uri: props.photo,
+          uri: image,
         }}
       />
       <ListItem.Content>

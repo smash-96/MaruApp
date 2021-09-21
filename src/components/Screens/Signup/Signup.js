@@ -18,6 +18,7 @@ import {
   setUserEmail,
 } from "../../../slices/userInfoSlice";
 import TNActivityIndicator from "../../Custom/TNActivityIndicator/TNActivityIndicator";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const signupSchema = yup.object({
   fname: yup.string().required("First Name cannot be empty"),
@@ -222,14 +223,33 @@ const Signup = (props) => {
               </>
             )}
           </Formik>
-          <View style={styles.authenticationButton}>
-            <Authentication_Button
+          <View>
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: "bold",
+              }}
+            >
+              {I18n.t("signup.login")}
+              <Text
+                style={{
+                  // fontSize: 16,
+                  fontWeight: "bold",
+                  color: "blue",
+                }}
+                onPress={login}
+              >
+                {" "}
+                {I18n.t("signup.eText")}
+              </Text>
+            </Text>
+            {/* <Authentication_Button
               title={I18n.t("signup.login")}
               backGroundColor={"#2c88d1"}
               textColor={"#FFFFFF"}
               borderColor={"#2c88d1"}
               handlePress={login}
-            />
+            /> */}
           </View>
         </Content>
       </Container>

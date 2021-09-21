@@ -10,6 +10,8 @@ import {
 //import RNCallKeep from "react-native-callkeep";
 import { selectUserData } from "../../../../slices/userAuthSlice";
 
+import axios from "axios";
+
 // // Twilio imports
 // import { TwilioVideo } from "react-native-twilio-video-webrtc";
 // import { TWILIO_SERVER_ENDPOINT } from "../../streaming/twilio/config";
@@ -77,6 +79,9 @@ const IMAVCallContainerView = (props) => {
 
   useEffect(() => {
     if (currentUser?.user) {
+      // axios.get(`${API_URL}`).then((res) => {
+      //   console.log("Axios NTS TOKEN", res);
+      // });
       fetch(`${API_URL}`)
         .then((res) => res.json())
         .then((data) => {

@@ -67,7 +67,8 @@ const MapScreen = (props) => {
   const [t_id, setT_id] = useState(null);
 
   useLayoutEffect(() => {
-    return () => {
+    let isMounted = true;
+    if (isMounted) {
       if (activeRequestData) {
         if (activeRequestData.status === "open" && userType === "helpee") {
           setNeedHelp(false);
@@ -83,6 +84,9 @@ const MapScreen = (props) => {
           }
         }
       }
+    }
+    return () => {
+      isMounted = false;
     };
   });
 
@@ -97,6 +101,13 @@ const MapScreen = (props) => {
     });
     return requestDelete;
   });
+
+  useEffect(() => {
+    if (activeRequestData && giveHelp) {
+      dispatch(setActiveRequestData(null));
+      dispatch(setHelpeeLocation(null));
+    }
+  }, [giveHelp]);
 
   useEffect(() => {
     const userID = props.route.params.user.uid;
@@ -366,7 +377,7 @@ const MapScreen = (props) => {
 
   const enterChat = async () => {
     const userID = props.route.params.user.uid;
-    setLoading(true);
+    //setLoading(true);
     const docData = await db.collection("Users").doc(t_id).get();
     if (docData) {
       navigation.navigate("Messages", {
@@ -388,21 +399,23 @@ const MapScreen = (props) => {
         { lastMessageTime: firestore.FieldValue.serverTimestamp() },
         t_id
       );
+
+      //setLoading(true);
     } else {
       console.log("Data Fetch Error from Firebase!");
     }
   };
 
-  // const startNavigation = async () => {
-  //   console.log("Start Navigation");
+  const startNavigation = async () => {
+    console.log("Start Navigation");
 
-  //   if (!tracking) {
-  //     await new Promise((resolve) => setTimeout(resolve, 2000));
-  //     setTracking(true);
-  //   } else {
-  //     setTracking(false);
-  //   }
-  // };
+    if (!tracking) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setTracking(true);
+    } else {
+      setTracking(false);
+    }
+  };
 
   return (
     <View>
@@ -576,7 +589,7 @@ const MapScreen = (props) => {
           <View></View>
         )}
       </View>
-      {loading && <TNActivityIndicator />}
+      {/* {loading && <TNActivityIndicator />} */}
     </View>
   );
 };

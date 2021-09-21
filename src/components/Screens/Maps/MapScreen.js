@@ -10,6 +10,7 @@ import {
   Image,
   Pressable,
   Text,
+  ActivityIndicator,
 } from "react-native";
 import { Avatar, Icon } from "react-native-elements";
 import { auth, db } from "../../../firebase/firebaseConfig";
@@ -62,6 +63,7 @@ const MapScreen = (props) => {
   const [helperModalData, setHelperModalData] = useState(null);
   const [refresh, doRefresh] = useState(0); // To trigger function in Map(child)
   const [loading, setLoading] = useState(false);
+  const [requesting, setRequesting] = useState(false);
 
   const navigation = useNavigation();
   const [t_id, setT_id] = useState(null);
@@ -102,12 +104,12 @@ const MapScreen = (props) => {
     return requestDelete;
   });
 
-  useEffect(() => {
-    if (activeRequestData && giveHelp) {
-      dispatch(setActiveRequestData(null));
-      dispatch(setHelpeeLocation(null));
-    }
-  }, [giveHelp]);
+  // useEffect(() => {
+  //   if (activeRequestData && giveHelp) {
+  //     dispatch(setActiveRequestData(null));
+  //     dispatch(setHelpeeLocation(null));
+  //   }
+  // }, [giveHelp]);
 
   useEffect(() => {
     const userID = props.route.params.user.uid;
@@ -190,18 +192,20 @@ const MapScreen = (props) => {
 
   const helpeeAction = async () => {
     console.log("Need Help?");
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     if (needHelp === true) {
       setHelpeeModalOpen(true);
     } else {
       // cancel button function
-      Alert.alert(I18n.t("map.cancel.header"), I18n.t("map.cancel.body"));
-
       clearRequest();
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      Alert.alert(I18n.t("map.cancel.header"), I18n.t("map.cancel.body"));
     }
   };
 
   const helperAction = async () => {
     console.log("Give Help?");
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     if (giveHelp === true) {
       const requests = db.collection("requests");
       await requests
@@ -251,17 +255,17 @@ const MapScreen = (props) => {
               }
             }
           } else {
-            Alert.alert(I18n.t("map.noReq.header"), I18n.t("map.noReq.body"));
+            Alert.alert(I18n.t("map.cancel.header"), I18n.t("map.cancel.body"));
           }
         })
         .catch((err) => {
           console.log("Error", err);
         });
     } else {
-      Alert.alert(I18n.t("map.noReq.header"), I18n.t("map.noReq.body"));
-
       // set for helper
       clearRequest();
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      Alert.alert(I18n.t("map.noReq.header"), I18n.t("map.noReq.body"));
     }
   };
 
@@ -347,32 +351,44 @@ const MapScreen = (props) => {
     //cRef = db.collection("requests").doc(t_id);
     if (userType === "helper") {
       cRef = db.collection("requests").doc(t_id);
-      if (cRef) {
-        //await cRef.delete();
-        await moveDoc(
-          "requests",
-          t_id,
-          `CompletedRequests/${t_id}/AllRequests`,
-          null,
-          uuid.v4()
-        );
+      try {
+        if (cRef) {
+          //await cRef.delete();
+          await moveDoc(
+            "requests",
+            t_id,
+            `CompletedRequests/${t_id}/AllRequests`,
+            null,
+            uuid.v4()
+          );
+        }
+      } catch (err) {
+        console.log("ERROR1", err);
       }
     } else if (userType === "helpee") {
       cRef = db.collection("requests").doc(userID);
-      if (cRef) {
-        //await cRef.delete();
-        await moveDoc(
-          "requests",
-          userID,
-          `CompletedRequests/${userID}/AllRequests`,
-          null,
-          uuid.v4()
-        );
+      try {
+        if (cRef) {
+          //await cRef.delete();
+          await moveDoc(
+            "requests",
+            userID,
+            `CompletedRequests/${userID}/AllRequests`,
+            null,
+            uuid.v4()
+          );
+        }
+      } catch (err) {
+        console.log("ERROR2", err);
       }
     }
-    db.collection("Users").doc(userID).update({
-      helpRequestID: null,
-    });
+    try {
+      db.collection("Users").doc(userID).update({
+        helpRequestID: null,
+      });
+    } catch (err) {
+      console.log("ERROR3", err);
+    }
   };
 
   const enterChat = async () => {
@@ -512,20 +528,6 @@ const MapScreen = (props) => {
             </View>
           </TouchableOpacity>
         ) : (
-          //  <Button
-          //   title={needHelp === true ? "Need Help?" : "Cancel Request"}
-          //   onPress={helpeeAction}
-          //   // containerStyle={{
-          //   //   borderRadius: 30,
-          //   //   borderWidth: 10,
-          //   //   borderColor: "#2289dc",
-          //   // }}
-          // />
-          // <Button
-          //   title={giveHelp === true ? "Give Help?" : "Cancel Help"}
-          //   onPress={helperAction}
-          //   style={{ borderColor: "red", borderWidth: 23 }}
-          // />
           <TouchableOpacity
             activeOpacity={0.825}
             style={{

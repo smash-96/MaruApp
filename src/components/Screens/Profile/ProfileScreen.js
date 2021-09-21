@@ -13,7 +13,7 @@ import UserAvatar from "../../Custom/UserAvatar/UserAvatar";
 import deviceStorage from "../../Utils/AuthDeviceStorage";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scrollview";
 import { auth, db } from "../../../firebase/firebaseConfig";
-import firestore from "@react-native-firebase/firestore";
+//import firestore from "@react-native-firebase/firestore";
 import storage from "@react-native-firebase/storage";
 import dynamic_styles from "./styles";
 import I18n from "../../../localization/utils/language";
@@ -317,7 +317,7 @@ const ProfileScreen = (props) => {
       //   //setProfileLock(true);
       // }
 
-      //await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       setUploading(false);
 
       Alert.alert(

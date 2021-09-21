@@ -12,7 +12,6 @@ import {
   DrawerItemList,
   DrawerItem,
 } from "@react-navigation/drawer";
-import deviceStorage from "../components/Utils/AuthDeviceStorage";
 import MapScreen from "../components/Screens/Maps/MapScreen";
 import ProfileScreen from "../components/Screens/Profile/ProfileScreen";
 import SettingScreen from "../components/Screens/Settings/SettingScreen";

@@ -104,20 +104,23 @@ const UserAvatar = (props) => {
   const onActionDone = (index) => {
     if (index == 0) {
       takePhotoFromCamera();
+      props.parentFunc("avatar");
       //onPressAddPhotoBtn();
-    }
-    if (index == 1) {
+    } else if (index == 1) {
       choosePhotoFromLibrary();
+      props.parentFunc("avatar");
     }
-    if (index == 3) {
-      // Remove button
-      // if (profilePictureURL) {
-      //   setProfilePictureURL(null);
-      //   props.setProfilePicture(null);
-      // }
-      setImage(baseAvatar);
-      props.setProfilePicture(baseAvatar);
-    }
+    // if (index == 3) {
+    //   // Remove button
+    //   // if (profilePictureURL) {
+    //   //   setProfilePictureURL(null);
+    //   //   props.setProfilePicture(null);
+    //   // }
+    //   setImage(baseAvatar);
+    //   props.setProfilePicture(baseAvatar);
+
+    //   props.parentFunc("avatar");
+    // }
   };
 
   return (
@@ -160,10 +163,10 @@ const UserAvatar = (props) => {
           "Open Camera",
           "Upload Photo",
           "Cancel",
-          "Remove Profile Photo",
+          //"Remove Profile Photo",
         ]}
         cancelButtonIndex={2}
-        destructiveButtonIndex={3}
+        //destructiveButtonIndex={3}
         onPress={(index) => {
           onActionDone(index);
         }}

@@ -25,6 +25,16 @@ const getAppLanguage = async () => {
   }
 };
 
+const getFirstSignup = async () => {
+  try {
+    const result = await AsyncStorage.getItem("first_signup");
+
+    return result;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 /**
  * Get Should Show OnBoarding Flow
  * @param {String} value
@@ -45,11 +55,21 @@ const setAppLanguage = async (value) => {
   }
 };
 
+const setFirstSignup = async (value) => {
+  try {
+    await AsyncStorage.setItem("first_signup", value);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 const authDeviceStorage = {
   getShouldShowOnboardingFlow,
   getAppLanguage,
   setShouldShowOnboardingFlow,
   setAppLanguage,
+  getFirstSignup,
+  setFirstSignup,
 };
 
 export default authDeviceStorage;

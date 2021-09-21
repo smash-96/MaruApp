@@ -12,6 +12,7 @@ const Picker = (props) => {
   const [selected_data, set_selected_data] = useState("");
   const setValue = (index, picker_type) => {
     if (picker_type == "gender") {
+      console.log("GENDER HERE!");
       if (index == 0) {
         set_selected_data("Male");
       } else {
@@ -20,8 +21,10 @@ const Picker = (props) => {
     } else {
       if (index == 0) {
         set_selected_data("helper");
+        props.parentFunc("userType");
       } else {
         set_selected_data("helpee");
+        props.parentFunc("userType");
       }
     }
   };

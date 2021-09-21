@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { Avatar, Button } from "react-native-elements";
 import UserAvatar from "../../Custom/UserAvatar/UserAvatar";
-import { Container, Content } from "native-base";
+import deviceStorage from "../../Utils/AuthDeviceStorage";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scrollview";
 import { auth, db } from "../../../firebase/firebaseConfig";
 import firestore from "@react-native-firebase/firestore";
@@ -35,7 +35,6 @@ import {
   selectUserAddress,
   selectUserGender,
   selectUserAge,
-  selectConnecting,
 } from "../../../slices/userInfoSlice";
 import { selectActiveRequestData } from "../../../slices/helpRequestSlice";
 import { useNavigation } from "@react-navigation/native";
@@ -67,6 +66,7 @@ const ProfileScreen = (props) => {
   const [lname, setLname] = useState(null);
   const [address, setAddress] = useState(null);
   const [age, setAge] = useState(null);
+  const [btnDisable, setBtnDisable] = useState(false);
   const options_gender = [
     <Text style={styles.action_sheet}>{I18n.t("profile.sheet1.male")}</Text>,
     <Text style={styles.action_sheet}>{I18n.t("profile.sheet1.female")}</Text>,
@@ -124,11 +124,12 @@ const ProfileScreen = (props) => {
     }
     return false;
   }
-  // useLayoutEffect(() => {
-  //   if (checkProfileComplete() === true) {
-  //     setProfileLock(false);
-  //   }
-  // }, [profileLock]);
+
+  useEffect(() => {
+    if (checkProfileComplete() === true) {
+      setProfileLock(false);
+    }
+  });
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -137,7 +138,7 @@ const ProfileScreen = (props) => {
       headerTitleStyle: { color: "white" },
       headerLeft: () => (
         <View style={{ marginLeft: 20 }}>
-          {checkProfileComplete() === true ? (
+          {profileLock === false ? (
             <TouchableOpacity
               onPress={() => navigation.toggleDrawer()}
               activeOpacity={0.5}
@@ -196,7 +197,11 @@ const ProfileScreen = (props) => {
     setGender(userGender);
     setAge(userAge);
     setUType(userType);
-  }, []);
+
+    if (checkProfileComplete() === true) {
+      setBtnDisable(true);
+    }
+  }, [userAddress, userGender, userAge, userType]);
 
   const uploadImage = async () => {
     if (image != baseAvatar) {
@@ -264,8 +269,8 @@ const ProfileScreen = (props) => {
         userType: uType,
       });
 
-      dispatch(setUserFname(fname));
-      dispatch(setUserLname(lname));
+      // dispatch(setUserFname(fname));
+      // dispatch(setUserLname(lname));
       dispatch(setUserAddress(address));
       dispatch(setUserGender(gender));
       dispatch(setUserAge(age));
@@ -283,23 +288,38 @@ const ProfileScreen = (props) => {
           auth.currentUser.updateProfile({ photoURL: photoUrl });
         }
       }
-      // else if (image === baseAvatar) {
+      // else {
       //   cRef.update({
-      //     photoUrl: baseAvatar,
+      //     photoUrl: null,
       //   });
-      //   dispatch(setUserPhoto(baseAvatar));
+      //   dispatch(setUserPhoto(null));
 
-      //   auth.currentUser.updateProfile({ photoURL: baseAvatar });
+      //   auth.currentUser.updateProfile({ photoURL: null });
       // }
 
-      if (checkProfileComplete() === true) {
-        setProfileLock(false);
-      } else {
-        setProfileLock(true);
-      }
+      deviceStorage.setFirstSignup("true");
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // if (checkProfileComplete() === true) {
+      //   setBtnDisable(true);
+      // }
+      // if (checkProfileComplete() === true) {
+      //   console.log("PROFILE COMPLETE");
+      //   setBtnDisable(true);
+      //   //setProfileLock(false);
+      //   deviceStorage.setFirstSignup("true");
+      //   console.log(
+      //     "await deviceStorage.getFirstSignup()",
+      //     await deviceStorage.getFirstSignup()
+      //   );
+      // } else {
+      //   console.log("PROFILE INCOMPLETE");
+      //   setBtnDisable(false);
+      //   //setProfileLock(true);
+      // }
+
+      //await new Promise((resolve) => setTimeout(resolve, 2000));
       setUploading(false);
+
       Alert.alert(
         I18n.t("profile.alert1.header"),
         I18n.t("profile.alert1.text")
@@ -309,6 +329,25 @@ const ProfileScreen = (props) => {
         I18n.t("profile.alert3.header"),
         I18n.t("profile.alert3.text")
       );
+    }
+  };
+
+  const setDisableBtnFromPickerChild = (child) => {
+    if (checkProfileComplete() === true) {
+      // comparing equal because state is getting set after this function is execcuted
+      if (child === "userType") {
+        if (userType === uType) {
+          setBtnDisable(false);
+        } else {
+          setBtnDisable(true);
+        }
+      } else if (child === "avatar") {
+        if (userPhoto !== image) {
+          setBtnDisable(false);
+        } else {
+          setBtnDisable(true);
+        }
+      }
     }
   };
 
@@ -322,32 +361,35 @@ const ProfileScreen = (props) => {
         <UserAvatar
           setProfilePicture={setProfilePicture}
           profilePic={profilePic}
+          parentFunc={setDisableBtnFromPickerChild}
         />
         <View>
           {/* First Name */}
           <View style={styles.singleRow}>
             <Text style={styles.left_fields}>{I18n.t("profile.fname")}</Text>
+            <Text style={styles.fields}>{fname}</Text>
 
-            <TextInput
+            {/* <TextInput
               style={styles.fields}
               onChangeText={(val) => setFname(val)}
               value={fname}
               //defaultValue={userFname}
               placeholder="John"
-            />
+            /> */}
           </View>
 
+          {/* Last Name */}
           <View style={styles.singleRow}>
-            {/* Last Name */}
             <Text style={styles.left_fields}>{I18n.t("profile.lname")}</Text>
+            <Text style={styles.fields}>{lname}</Text>
 
-            <TextInput
+            {/* <TextInput
               style={styles.fields}
               onChangeText={(val) => setLname(val)}
               value={lname}
               //defaultValue={userLname}
               placeholder="Doe"
-            />
+            /> */}
           </View>
           {/* 
           <View style={styles.singleRow}>
@@ -362,10 +404,12 @@ const ProfileScreen = (props) => {
             />
           </View> */}
 
+          {/* Address  */}
           <View style={styles.singleRow}>
-            {/* Address  */}
             <Text style={styles.left_fields}>{I18n.t("profile.address")}</Text>
             {userAddress !== null ? (
+              <Text style={styles.fields}>{address}</Text>
+            ) : (
               <TextInput
                 style={styles.fields}
                 onChangeText={(val) => {
@@ -375,44 +419,32 @@ const ProfileScreen = (props) => {
                 //defaultValue={userAddress}
                 placeholder="Address"
               />
-            ) : (
-              <TextInput
-                style={styles.fields}
-                onChangeText={(val) => {
-                  setAddress(val);
-                }}
-                value={address}
-                placeholder="Address"
-              />
             )}
           </View>
 
           {/* Gender */}
           <View style={styles.singleRow}>
             <Text style={styles.left_fields}>{I18n.t("profile.gender")}</Text>
-
-            <Picker
-              myValue={gender}
-              getValues={getPickerValues}
-              options={options_gender}
-              title={I18n.t("profile.gender")}
-              myplaceholder={gender_placeHolder}
-            />
+            {userGender !== "" ? (
+              <Text style={styles.fields}>{gender}</Text>
+            ) : (
+              <Picker
+                myValue={gender}
+                getValues={getPickerValues}
+                options={options_gender}
+                title={I18n.t("profile.gender")}
+                myplaceholder={gender_placeHolder}
+                parentFunc={setDisableBtnFromPickerChild}
+              />
+            )}
           </View>
+
+          {/* Age */}
           <View style={styles.singleRow}>
             <Text style={styles.left_fields}>{I18n.t("profile.age")}</Text>
 
             {userAge !== null ? (
-              <TextInput
-                style={styles.dob}
-                onChangeText={(val) => {
-                  setAge(val);
-                }}
-                value={age}
-                //defaultValue={userAge}
-                placeholder="Your Age"
-                keyboardType="numeric"
-              />
+              <Text style={styles.fields}>{age}</Text>
             ) : (
               <TextInput
                 style={styles.dob}
@@ -425,8 +457,18 @@ const ProfileScreen = (props) => {
               />
             )}
 
-            {/* <TextInput style={styles.fields} placeholder="Your age" /> */}
+            {/* <TextInput
+              style={styles.dob}
+              onChangeText={(val) => {
+                setAge(val);
+              }}
+              value={age}
+              placeholder="Your Age"
+              keyboardType="numeric"
+            /> */}
           </View>
+
+          {/* User Type */}
           <View style={styles.singleRow}>
             <Text style={styles.left_fields}>{I18n.t("profile.type")}</Text>
             <Picker
@@ -435,6 +477,7 @@ const ProfileScreen = (props) => {
               options={options_type}
               title={I18n.t("profile.type")}
               myplaceholder={type_placeHolder}
+              parentFunc={setDisableBtnFromPickerChild}
             />
           </View>
         </View>
@@ -458,6 +501,7 @@ const ProfileScreen = (props) => {
               }}
             >
               <Button
+                disabled={btnDisable}
                 containerStyle={{
                   margin: "10%",
 

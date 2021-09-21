@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState, useLayoutEffect, useEffect } from "react";
 import {
   SafeAreaView,
   Text,
@@ -12,12 +12,13 @@ import {
   DrawerItemList,
   DrawerItem,
 } from "@react-navigation/drawer";
+import deviceStorage from "../components/Utils/AuthDeviceStorage";
 import MapScreen from "../components/Screens/Maps/MapScreen";
 import ProfileScreen from "../components/Screens/Profile/ProfileScreen";
 import SettingScreen from "../components/Screens/Settings/SettingScreen";
 import UserAvatar from "../components/Custom/UserAvatar/UserAvatar";
 import { useSelector } from "react-redux";
-import { selectUserPhoto } from "../slices/userInfoSlice";
+import { selectUserPhoto, selectFirstSignup } from "../slices/userInfoSlice";
 import ChatStack from "./ChatStack";
 import { auth } from "../firebase/firebaseConfig";
 import { useNavigation } from "@react-navigation/native";
@@ -110,6 +111,14 @@ function CustomDrawerContent(props) {
 const Drawer = createDrawerNavigator();
 
 const MapStack = (props) => {
+  let routeName;
+  const firstSignup = useSelector(selectFirstSignup);
+  if (firstSignup === "true") {
+    routeName = "MapScreen";
+  } else if (firstSignup === "false") {
+    routeName = "ProfileScreen";
+  }
+
   return (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}
@@ -118,6 +127,7 @@ const MapStack = (props) => {
           backgroundColor: "white",
         },
       }}
+      initialRouteName={routeName}
     >
       <Drawer.Screen
         name="ProfileScreen"

@@ -3,6 +3,7 @@ import {
   View,
   TouchableOpacity,
   FlatList,
+  Text,
   NativeModules,
   LayoutAnimation,
   UIManager,
@@ -104,20 +105,40 @@ const ChatScreen = (props) => {
 
   return (
     <SafeAreaProvider style={{ backgroundColor: "#effdff" }}>
-      <FlatList
-        data={chats}
-        renderItem={({ item }) => (
-          <CustomList
-            key={item.id}
-            id={item.id}
-            uid={item.data.uid}
-            fname={item.data.fname}
-            lname={item.data.lname}
-            photo={item.data.photoUrl}
-            enterChat={enterChat}
-          />
-        )}
-      />
+      {chats.length === 0 ? (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: "bold",
+              color: "dodgerblue",
+            }}
+          >
+            You have no connections yet!
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={chats}
+          renderItem={({ item }) => (
+            <CustomList
+              key={item.id}
+              id={item.id}
+              uid={item.data.uid}
+              fname={item.data.fname}
+              lname={item.data.lname}
+              photo={item.data.photoUrl}
+              enterChat={enterChat}
+            />
+          )}
+        />
+      )}
     </SafeAreaProvider>
   );
 };

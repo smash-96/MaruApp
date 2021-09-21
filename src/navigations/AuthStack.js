@@ -56,30 +56,6 @@ export default function AuthStack(props) {
           component={MapStack}
           options={{ headerShown: false }}
         />
-
-        {/* {isUser === null ? (
-          <>
-            <Stack.Screen
-              name="Login"
-              component={Login}
-              options={{
-                headerShown: false,
-                animationTypeForReplace: auth ? "push" : "pop",
-              }}
-            />
-            <Stack.Screen
-              name="Signup"
-              component={Signup}
-              options={{ headerShown: false }}
-            />
-          </>
-        ) : (
-          <Stack.Screen
-            name="MapStack"
-            component={MapStack}
-            options={{ headerShown: false }}
-          />
-        )} */}
       </Stack.Navigator>
     </SafeAreaProvider>
   );

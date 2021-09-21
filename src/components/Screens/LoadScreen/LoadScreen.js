@@ -6,7 +6,7 @@ import { auth } from "../../../firebase/firebaseConfig";
 import authManager from "../../Utils/AuthManager";
 import NotifService from "../../../notifictions/NotifService";
 import { useDispatch } from "react-redux";
-import { setUserLanguage } from "../../../slices/userInfoSlice";
+import { setUserLanguage, setFirstSignup } from "../../../slices/userInfoSlice";
 import { setLocale } from "../../../localization/utils/language";
 
 const LoadScreen = () => {
@@ -31,9 +31,10 @@ const LoadScreen = () => {
       await deviceStorage.getShouldShowOnboardingFlow();
     if (!shouldShowOnboardingFlow) {
       const appLanguage = await deviceStorage.getAppLanguage();
-      console.log("appLanguage", appLanguage);
+      const firstSignup = await deviceStorage.getFirstSignup();
       dispatch(setUserLanguage(appLanguage));
       setLocale(appLanguage);
+      dispatch(setFirstSignup(firstSignup));
       if (auth?.currentUser) {
         fetchPersistedUserIfNeeded();
         return;
@@ -51,6 +52,7 @@ const LoadScreen = () => {
       .retrievePersistedAuthUser()
       .then((response) => {
         if (response?.user) {
+          //console.log("USER", response?.user);
           //   dispatch(
           //     setUserData({
           //       user: response.user,

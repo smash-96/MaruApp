@@ -82,7 +82,7 @@ const IMAVCallContainerView = (props) => {
       // axios.get(`${API_URL}`).then((res) => {
       //   console.log("Axios NTS TOKEN", res);
       // });
-      fetch(`${API_URL}`)
+      fetch(`${API_URL}/error`)
         .then((res) => res.json())
         .then((data) => {
           const value = { iceServers: data.iceServers };

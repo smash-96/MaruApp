@@ -14,7 +14,7 @@ const initialState = {
   //
   helperLocation: null,
   helpeeLocation: null,
-  connecting: false,
+  firstSignup: false,
 };
 
 export const userInfoSlice = createSlice({
@@ -59,8 +59,8 @@ export const userInfoSlice = createSlice({
     setHelpeeLocation: (state, action) => {
       state.helpeeLocation = action.payload;
     },
-    setConnecting: (state, action) => {
-      state.connecting = action.payload;
+    setFirstSignup: (state, action) => {
+      state.firstSignup = action.payload;
     },
   },
 });
@@ -80,7 +80,7 @@ export const {
   //
   setHelperLocation,
   setHelpeeLocation,
-  setConnecting,
+  setFirstSignup,
 } = userInfoSlice.actions;
 
 // Selectors - used to fetch global state
@@ -97,6 +97,6 @@ export const selectUserLanguage = (state) => state.user.userLanguage;
 //
 export const selectHelperLocation = (state) => state.user.helperLocation;
 export const selectHelpeeLocation = (state) => state.user.helpeeLocation;
-export const selectConnecting = (state) => state.user.connecting;
+export const selectFirstSignup = (state) => state.user.firstSignup;
 
 export default userInfoSlice.reducer;

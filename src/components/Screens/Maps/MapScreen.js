@@ -81,6 +81,8 @@ const MapScreen = (props) => {
             setGiveHelp(false);
 
             dispatch(setHelpeeLocation(activeRequestData.locationHelpee));
+
+            console.log("useEffect helpeeLocation", helpeeLocation);
           } else {
             setNeedHelp(false);
           }
@@ -89,6 +91,7 @@ const MapScreen = (props) => {
     }
     return () => {
       isMounted = false;
+      dispatch(setActiveRequestData(null));
     };
   });
 
@@ -161,51 +164,71 @@ const MapScreen = (props) => {
   // });
 
   const broadcastRequest = async (request) => {
-    const userID = props.route.params.user.uid;
-    const { subject, details, time } = request;
-    const requestData = {
-      helpeeID: userID,
-      helperID: null,
-      status: "open",
-      locationHelpee: helpeeLocation,
-      locationHelper: null,
-    };
-    dispatch(setActiveRequestData(requestData));
-    const cRef = db.collection("requests").doc(userID);
-    cRef.set({
-      helpeeID: userID,
-      subject: subject || "NA",
-      details: details || "NA",
-      status: "open",
-      locationHelpee: helpeeLocation,
-      //locationHelpee: simulatedGetMapRegion(),
-      ttl: time || "NA", // How soon does the helpee need help. E.g: within an hour
-      timeStamp: firestore.FieldValue.serverTimestamp(),
-    });
-    db.collection("Users").doc(userID).update({
-      helpRequestID: userID,
-    });
-    Alert.alert(I18n.t("map.broadcast.header"), I18n.t("map.broadcast.body"));
-    setNeedHelp(false);
     setHelpeeModalOpen(false);
+    setRequesting(true);
+    try {
+      const userID = props.route.params.user.uid;
+      const { subject, details, time } = request;
+      const requestData = {
+        helpeeID: userID,
+        helperID: null,
+        status: "open",
+        locationHelpee: helpeeLocation,
+        locationHelper: null,
+      };
+      dispatch(setActiveRequestData(requestData));
+      const cRef = db.collection("requests").doc(userID);
+      cRef.set({
+        helpeeID: userID,
+        subject: subject || "NA",
+        details: details || "NA",
+        status: "open",
+        locationHelpee: helpeeLocation,
+        //locationHelpee: simulatedGetMapRegion(),
+        ttl: time || "NA", // How soon does the helpee need help. E.g: within an hour
+        timeStamp: firestore.FieldValue.serverTimestamp(),
+      });
+      db.collection("Users").doc(userID).update({
+        helpRequestID: userID,
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      Alert.alert(I18n.t("map.broadcast.header"), I18n.t("map.broadcast.body"));
+    } catch (err) {
+      console.log("Request Broadcast Error", err);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      Alert.alert("Request Broadcast Error", err);
+    }
+
+    setNeedHelp(false);
+    setRequesting(false);
   };
 
   const helpeeAction = async () => {
     console.log("Need Help?");
-    await new Promise((resolve) => setTimeout(resolve, 2000));
     if (needHelp === true) {
       setHelpeeModalOpen(true);
     } else {
       // cancel button function
-      clearRequest();
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      Alert.alert(I18n.t("map.cancel.header"), I18n.t("map.cancel.body"));
+      setRequesting(true);
+
+      try {
+        clearRequest();
+
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        Alert.alert(I18n.t("map.cancel.header"), I18n.t("map.cancel.body"));
+      } catch (err) {
+        console.log("Helpee Request Cancellation Failed", err);
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        Alert.alert("Request Cancel Error", err);
+      }
+
+      setRequesting(false);
     }
   };
 
   const helperAction = async () => {
     console.log("Give Help?");
-    await new Promise((resolve) => setTimeout(resolve, 2000));
     if (giveHelp === true) {
       const requests = db.collection("requests");
       await requests
@@ -247,15 +270,16 @@ const MapScreen = (props) => {
                 //     "No help request is available in the system right now."
                 //   );
                 // }
-              } else {
-                Alert.alert(
-                  I18n.t("map.noReq.header"),
-                  I18n.t("map.noReq.body")
-                );
               }
+              // else {
+              //   Alert.alert(
+              //     I18n.t("map.noReq.header"),
+              //     I18n.t("map.noReq.body")
+              //   );
+              // }
             }
           } else {
-            Alert.alert(I18n.t("map.cancel.header"), I18n.t("map.cancel.body"));
+            Alert.alert(I18n.t("map.noReq.header"), I18n.t("map.noReq.body"));
           }
         })
         .catch((err) => {
@@ -263,49 +287,72 @@ const MapScreen = (props) => {
         });
     } else {
       // set for helper
-      clearRequest();
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      Alert.alert(I18n.t("map.noReq.header"), I18n.t("map.noReq.body"));
+      setRequesting(true);
+
+      try {
+        clearRequest();
+
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        Alert.alert(I18n.t("map.cancel.header"), I18n.t("map.cancel.body"));
+      } catch (err) {
+        console.log("Helper Request Cancellation Failed", err);
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        Alert.alert("Request Cancel Error", err);
+      }
+
+      setRequesting(false);
     }
   };
 
   const acceptRequest = async () => {
-    const userID = props.route.params.user.uid;
-    const requestData = {
-      helpeeID: helperModalData.helpeeID,
-      helperID: userID,
-      status: "open",
-      locationHelpee: helperModalData.locationHelpee,
-      locationHelper: helperLocation,
-    };
-    dispatch(setActiveRequestData(requestData));
+    setHelperModalOpen(false);
+    setRequesting(true);
 
-    const requests = await db.collection("requests");
-    if (
-      (await requests.doc(helperModalData.id).get()).data().status !=
-      "InProgress"
-    ) {
-      requests.doc(helperModalData.id).update({
+    try {
+      const userID = props.route.params.user.uid;
+      const requestData = {
+        helpeeID: helperModalData.helpeeID,
         helperID: userID,
-        status: "InProgress",
+        status: "open",
+        locationHelpee: helperModalData.locationHelpee,
         locationHelper: helperLocation,
-        initialHelperLocation: helperLocation,
-        //locationHelper: simulatedGetMapRegion(),
-      });
+      };
+      dispatch(setActiveRequestData(requestData));
 
-      db.collection("Users").doc(userID).update({
-        helpRequestID: helperModalData.helpeeID,
-      });
-      setT_id(helperModalData.helpeeID); // set helpee ID for helper to delete
-      accept(helperModalData);
-    } else {
-      Alert.alert(
-        "Request Not Available",
-        "Someone else agreed to help this person. Kindly try again!"
-      );
+      const requests = await db.collection("requests");
+      if (
+        (await requests.doc(helperModalData.id).get()).data().status !=
+        "InProgress"
+      ) {
+        requests.doc(helperModalData.id).update({
+          helperID: userID,
+          status: "InProgress",
+          locationHelper: helperLocation,
+          initialHelperLocation: helperLocation,
+          //locationHelper: simulatedGetMapRegion(),
+        });
+
+        db.collection("Users").doc(userID).update({
+          helpRequestID: helperModalData.helpeeID,
+        });
+        setT_id(helperModalData.helpeeID); // set helpee ID for helper to delete
+        accept(helperModalData);
+      } else {
+        Alert.alert(
+          "Request Not Available",
+          "Someone else agreed to help this person. Kindly try again!"
+        );
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    } catch (err) {
+      console.log("Request Accept Error", err);
+      Alert.alert("Request Accept Error", err);
     }
 
-    setHelperModalOpen(false);
+    setGiveHelp(false);
+    setNeedHelp(false);
+    setRequesting(false);
   };
 
   const accept = async (reqDoc) => {
@@ -324,9 +371,10 @@ const MapScreen = (props) => {
     //   "Request Accepted",
     //   "You have accepted to help someone in need."
     // );
+
     // set for helper
-    setGiveHelp(false);
-    setNeedHelp(false);
+    // setGiveHelp(false);
+    // setNeedHelp(false);
   };
 
   const clearRequest = async () => {
@@ -491,78 +539,119 @@ const MapScreen = (props) => {
         />
       </TouchableOpacity>
 
-      <View
-        style={{
-          position: "absolute", //use absolute position to show button on top of the map
-          bottom: 20,
-          alignItems: "center",
-          width: "100%",
-        }}
-      >
-        {userType !== "helper" ? (
-          <TouchableOpacity
-            activeOpacity={0.825}
+      {requesting === true ? (
+        <View
+          style={{
+            position: "absolute",
+            bottom: 20,
+            alignItems: "center",
+            width: "100%",
+          }}
+        >
+          {/* {needHelp !== true ? (
+            <Text
+              style={{
+                fontWeight: "bold",
+                fontSize: 15,
+              }}
+            >
+              Requesting Help
+            </Text>
+          ) : (
+            <Text
+              style={{
+                fontWeight: "bold",
+                fontSize: 15,
+              }}
+            >
+              Cancelling Help
+            </Text>
+          )} */}
+
+          <Text
             style={{
-              backgroundColor: "#2b88d1",
-              borderColor: "#2b88d1",
-              borderWidth: 20,
-              borderRadius: 20,
+              fontWeight: "bold",
+              fontSize: 15,
             }}
-            onPress={helpeeAction}
           >
-            <View style={{ borderRadius: 0, borderWidth: 0 }}>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  fontFamily: "verdana",
-                  color: "white",
-                  borderRadius: 0,
-                  borderWidth: 0,
-                }}
-              >
-                {needHelp === true
-                  ? I18n.t("map.needHelp")
-                  : I18n.t("map.cancelHelp")}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            activeOpacity={0.825}
-            style={{
-              backgroundColor: "#2b88d1",
-              borderColor: "#2b88d1",
-              borderWidth: 20,
-              borderRadius: 20,
-            }}
-            onPress={helperAction}
-          >
-            <View style={{ borderRadius: 0, borderWidth: 0 }}>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  fontFamily: "verdana",
-                  color: "white",
-                  borderRadius: 0,
-                  borderWidth: 0,
-                }}
-              >
-                {giveHelp === true
-                  ? I18n.t("map.giveHelp")
-                  : I18n.t("map.cancelHelp")}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        )}
-        {/* {helperLocation && helpeeLocation && userType === "helper" && (
+            Connecting
+          </Text>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      ) : (
+        <View
+          style={{
+            position: "absolute", //use absolute position to show button on bottom of the map
+            bottom: 20,
+            alignItems: "center",
+            width: "100%",
+          }}
+        >
+          {userType !== "helper" ? (
+            <TouchableOpacity
+              activeOpacity={0.825}
+              style={{
+                backgroundColor: "#2b88d1",
+                borderColor: "#2b88d1",
+                borderWidth: 20,
+                borderRadius: 20,
+              }}
+              onPress={helpeeAction}
+            >
+              <View style={{ borderRadius: 0, borderWidth: 0 }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    fontFamily: "verdana",
+                    color: "white",
+                    borderRadius: 0,
+                    borderWidth: 0,
+                  }}
+                >
+                  {needHelp === true
+                    ? I18n.t("map.needHelp")
+                    : I18n.t("map.cancelHelp")}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              activeOpacity={0.825}
+              style={{
+                backgroundColor: "#2b88d1",
+                borderColor: "#2b88d1",
+                borderWidth: 20,
+                borderRadius: 20,
+              }}
+              onPress={helperAction}
+            >
+              <View style={{ borderRadius: 0, borderWidth: 0 }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    fontFamily: "verdana",
+                    color: "white",
+                    borderRadius: 0,
+                    borderWidth: 0,
+                  }}
+                >
+                  {giveHelp === true
+                    ? I18n.t("map.giveHelp")
+                    : I18n.t("map.cancelHelp")}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          )}
+          {/* {helperLocation && helpeeLocation && userType === "helper" && (
           <Button
             title={tracking === false ? "Start Navigation" : "Stop Navigation"}
             onPress={startNavigation}
           />
         )} */}
-      </View>
+        </View>
+      )}
       <View
         style={{
           position: "absolute",

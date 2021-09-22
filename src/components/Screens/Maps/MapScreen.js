@@ -81,8 +81,6 @@ const MapScreen = (props) => {
             setGiveHelp(false);
 
             dispatch(setHelpeeLocation(activeRequestData.locationHelpee));
-
-            console.log("useEffect helpeeLocation", helpeeLocation);
           } else {
             setNeedHelp(false);
           }

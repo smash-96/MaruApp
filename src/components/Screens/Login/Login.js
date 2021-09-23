@@ -97,67 +97,68 @@ const Login = (props) => {
       .then(async (response) => {
         if (response?.user) {
           const user = response.user;
+          if (user.emailVerified) {
+            const requestID = (
+              await db.collection("Users").doc(user.uid).get()
+            ).data().helpRequestID;
+            if (requestID !== null) {
+              const requestData = (
+                await db.collection("requests").doc(requestID).get()
+              ).data();
+              dispatch(setActiveRequestData(requestData));
+            } else {
+              dispatch(setActiveRequestData(null));
+            }
 
-          const requestID = (
-            await db.collection("Users").doc(user.uid).get()
-          ).data().helpRequestID;
-          if (requestID !== null) {
-            const requestData = (
-              await db.collection("requests").doc(requestID).get()
-            ).data();
-            dispatch(setActiveRequestData(requestData));
-          } else {
-            dispatch(setActiveRequestData(null));
-          }
+            // console.log("LOGIN USER", user);
+            // delete user["createdAt"];
+            // delete user["lastOnlineTimestamp"];
+            //console.log("USER_NEW", user);
+            dispatch(setUserData({ user }));
 
-          // console.log("LOGIN USER", user);
-          // delete user["createdAt"];
-          // delete user["lastOnlineTimestamp"];
-          //console.log("USER_NEW", user);
-          dispatch(setUserData({ user }));
+            if (user.photoUrl) {
+              dispatch(setUserPhoto(user.photoUrl));
+            }
+            if (user.userType) {
+              dispatch(setUserType(user.userType));
+            } else {
+              dispatch(setUserType(""));
+            }
+            if (user.Gender) {
+              dispatch(setUserGender(user.Gender));
+            } else {
+              dispatch(setUserGender(""));
+            }
 
-          if (user.photoUrl) {
-            dispatch(setUserPhoto(user.photoUrl));
-          }
-          if (user.userType) {
-            dispatch(setUserType(user.userType));
-          } else {
-            dispatch(setUserType(""));
-          }
-          if (user.Gender) {
-            dispatch(setUserGender(user.Gender));
-          } else {
-            dispatch(setUserGender(""));
-          }
+            if (user.fname) {
+              dispatch(setUserFname(user.fname));
+            }
+            if (user.lname) {
+              dispatch(setUserLname(user.lname));
+            }
+            if (user.email) {
+              dispatch(setUserEmail(user.email));
+            }
+            if (user.Address) {
+              dispatch(setUserAddress(user.Address));
+            }
 
-          if (user.fname) {
-            dispatch(setUserFname(user.fname));
+            if (user.Age) {
+              dispatch(setUserAge(user.Age));
+            }
+            //
+            Keyboard.dismiss();
+            props.navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: "MapStack",
+                  params: { user: user },
+                },
+              ],
+            });
+            return;
           }
-          if (user.lname) {
-            dispatch(setUserLname(user.lname));
-          }
-          if (user.email) {
-            dispatch(setUserEmail(user.email));
-          }
-          if (user.Address) {
-            dispatch(setUserAddress(user.Address));
-          }
-
-          if (user.Age) {
-            dispatch(setUserAge(user.Age));
-          }
-          //
-          Keyboard.dismiss();
-          props.navigation.reset({
-            index: 0,
-            routes: [
-              {
-                name: "MapStack",
-                params: { user: user },
-              },
-            ],
-          });
-          return;
         }
         setIsLoading(false);
       })
@@ -207,6 +208,11 @@ const Login = (props) => {
     });
   };
   //
+  // useEffect(() => {
+  //   if (auth?.currentUser) {
+  //     auth.signOut();
+  //   }
+  // }, []);
 
   const login = (values, actions) => {
     console.log("LOGIN");
@@ -216,7 +222,8 @@ const Login = (props) => {
       .then(async (response) => {
         if (response?.user) {
           const user = response.user;
-          if (!user.emailVerified) {
+
+          if (user.emailVerified) {
             const requestID = (
               await db.collection("Users").doc(user.uid).get()
             ).data().helpRequestID;

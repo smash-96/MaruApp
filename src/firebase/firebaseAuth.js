@@ -15,7 +15,8 @@ const handleUserFromAuthStateChanged = (user, resolve) => {
       .get()
       .then((document) => {
         const userData = document.data();
-        resolve({ ...userData, id: user.uid, userID: user.uid });
+        const emailVerified = user.emailVerified;
+        resolve({ ...userData, id: user.uid, userID: user.uid, emailVerified });
       })
       .catch((error) => {
         resolve(null);
@@ -38,8 +39,8 @@ export const tryAlternatePersistedAuthUserRetriever = (resolve) => {
 export const retrievePersistedAuthUser = () => {
   return new Promise((resolve) => {
     return auth.onAuthStateChanged((user) => {
+      //console.log("LOGIN USER", user);
       if (user) {
-        //console.log("LOGIN USER", user);
         return handleUserFromAuthStateChanged(user, resolve);
       } else {
         return tryAlternatePersistedAuthUserRetriever(resolve);
@@ -477,7 +478,7 @@ export const fetchAndStorePushTokenIfPossible = async (user) => {
 export const updateUser = async (userID, newData) => {
   const dataWithOnlineStatus = {
     ...newData,
-    //lastOnlineTimestamp: firestore.FieldValue.serverTimestamp(), // Turn on when implementing "last seen & typinf indicators" etc
+    //lastOnlineTimestamp: firestore.FieldValue.serverTimestamp(), // Turn on when implementing "last seen & typing indicators" etc
   };
   return await usersRef
     .doc(userID)

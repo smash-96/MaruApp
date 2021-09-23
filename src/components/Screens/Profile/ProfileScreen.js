@@ -35,6 +35,7 @@ import {
   selectUserAddress,
   selectUserGender,
   selectUserAge,
+  selectFirstSignup,
 } from "../../../slices/userInfoSlice";
 import { selectActiveRequestData } from "../../../slices/helpRequestSlice";
 import { useNavigation } from "@react-navigation/native";
@@ -53,6 +54,7 @@ const ProfileScreen = (props) => {
   const userGender = useSelector(selectUserGender);
   const userAge = useSelector(selectUserAge);
   const activeRequestData = useSelector(selectActiveRequestData);
+  const firstSignup = useSelector(selectFirstSignup);
 
   const baseAvatar =
     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
@@ -184,6 +186,16 @@ const ProfileScreen = (props) => {
     if (userPhoto !== null) {
       setProfilePic(userPhoto);
     }
+
+    if (checkProfileComplete() === true) {
+      setBtnDisable(true);
+      // if (!firstSignup) {
+      //   Alert.alert(
+      //     "Profile Completed",
+      //     "Your profile is now complete. You can navigate through it by pressing the menu icon on top left."
+      //   );
+      // }
+    }
   }, [userPhoto, profilePic]);
 
   const setProfilePicture = (img) => {
@@ -200,6 +212,13 @@ const ProfileScreen = (props) => {
 
     if (checkProfileComplete() === true) {
       setBtnDisable(true);
+      console.log("firstSignup", firstSignup);
+      if (firstSignup !== "true") {
+        Alert.alert(
+          "Profile Completed",
+          "Your profile is now complete. You can navigate through it by pressing the menu icon on top left."
+        );
+      }
     }
   }, [userAddress, userGender, userAge, userType]);
 
@@ -320,10 +339,12 @@ const ProfileScreen = (props) => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setUploading(false);
 
-      Alert.alert(
-        I18n.t("profile.alert1.header"),
-        I18n.t("profile.alert1.text")
-      );
+      if (firstSignup === "true") {
+        Alert.alert(
+          I18n.t("profile.alert1.header"),
+          I18n.t("profile.alert1.text")
+        );
+      }
     } else {
       Alert.alert(
         I18n.t("profile.alert3.header"),

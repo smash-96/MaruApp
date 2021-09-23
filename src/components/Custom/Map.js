@@ -87,29 +87,60 @@ const Map = (props) => {
 
       //onCenter();
     } else {
-      console.log("Location fetching error");
-      if (userType === "helper") {
-        //1st corrdinate set for helper in simulator
-        dispatch(
-          setHelperLocation({
-            latitude: LATITUDE,
-            longitude: LONGITUDE,
-            latitudeDelta: LATITUDE_DELTA,
-            longitudeDelta: LONGITUDE_DELTA,
-          })
-        );
-      } else if (userType === "helpee") {
-        //1st corrdinate set for helpee in simulator
-        dispatch(
-          setHelpeeLocation({
-            latitude: LATITUDE,
-            longitude: LONGITUDE,
-            latitudeDelta: LATITUDE_DELTA,
-            longitudeDelta: LONGITUDE_DELTA,
-          })
-        );
-      }
-      //setErrorMsg(err);
+      getCurrentLocation().then((location) => {
+        if (location) {
+          setLatitude(location.latitude);
+          setLongitude(location.longitude);
+
+          if (userType === "helper") {
+            //1st corrdinate set for helper
+            dispatch(
+              setHelperLocation({
+                latitude: location.latitude,
+                longitude: location.longitude,
+                latitudeDelta: LATITUDE_DELTA,
+                longitudeDelta: LONGITUDE_DELTA,
+              })
+            );
+          } else if (userType === "helpee") {
+            //1st corrdinate set for helpee
+            dispatch(
+              setHelpeeLocation({
+                latitude: location.latitude,
+                longitude: location.longitude,
+                latitudeDelta: LATITUDE_DELTA,
+                longitudeDelta: LONGITUDE_DELTA,
+              })
+            );
+          }
+          setLoading(false);
+          setErrorMsg(null);
+        }
+      });
+
+      // console.log("Location fetching error");
+      // if (userType === "helper") {
+      //   //1st corrdinate set for helper in simulator
+      //   dispatch(
+      //     setHelperLocation({
+      //       latitude: LATITUDE,
+      //       longitude: LONGITUDE,
+      //       latitudeDelta: LATITUDE_DELTA,
+      //       longitudeDelta: LONGITUDE_DELTA,
+      //     })
+      //   );
+      // } else if (userType === "helpee") {
+      //   //1st corrdinate set for helpee in simulator
+      //   dispatch(
+      //     setHelpeeLocation({
+      //       latitude: LATITUDE,
+      //       longitude: LONGITUDE,
+      //       latitudeDelta: LATITUDE_DELTA,
+      //       longitudeDelta: LONGITUDE_DELTA,
+      //     })
+      //   );
+      // }
+      // //setErrorMsg(err);
     }
   }, [loading]);
 

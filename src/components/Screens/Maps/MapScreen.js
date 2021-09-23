@@ -244,30 +244,35 @@ const MapScreen = (props) => {
                 //   latitude: simulatedGetMapRegion().latitude,
                 //   longitude: simulatedGetMapRegion().longitude,
                 // };
-                const start = {
-                  latitude: helperLocation.latitude,
-                  longitude: helperLocation.longitude,
-                };
 
-                const end = {
-                  latitude: tempDoc[i].locationHelpee.latitude,
-                  longitude: tempDoc[i].locationHelpee.longitude,
-                };
-                let distance = haversine(start, end, {
-                  unit: "meter",
-                });
-                console.log("Distance", distance);
-                if (distance <= 10000) {
-                  setHelperModalData(tempDoc[i]);
-                  setHelperModalOpen(true);
-                  break;
-                }
+                // Distance Code
+                // const start = {
+                //   latitude: helperLocation.latitude,
+                //   longitude: helperLocation.longitude,
+                // };
+
+                // const end = {
+                //   latitude: tempDoc[i].locationHelpee.latitude,
+                //   longitude: tempDoc[i].locationHelpee.longitude,
+                // };
+                // let distance = haversine(start, end, {
+                //   unit: "meter",
+                // });
+                // console.log("Distance", distance);
+                // if (distance <= 10000) {
+                //   setHelperModalData(tempDoc[i]);
+                //   setHelperModalOpen(true);
+                //   break;
+                // }
                 // else {
                 //   Alert.alert(
                 //     "No Request Available",
                 //     "No help request is available in the system right now."
                 //   );
                 // }
+                setHelperModalData(tempDoc[i]);
+                setHelperModalOpen(true);
+                break;
               }
               // else {
               //   Alert.alert(

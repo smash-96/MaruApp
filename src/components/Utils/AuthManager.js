@@ -414,7 +414,6 @@ const fetchAndStoreExtraInfoUponLogin = async (user, accountCreated) => {
   authAPI.fetchAndStorePushTokenIfPossible(user);
 
   getLocation().then(async (location) => {
-    console.log("getLocation", location);
     const latitude = location.latitude;
     const longitude = location.longitude;
     var locationData = {};

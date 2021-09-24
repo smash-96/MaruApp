@@ -33,6 +33,7 @@ const dynamic_styles = () => {
     fields: {
       fontSize: 18,
       margin: 10,
+      color: "grey",
     },
     left_fields: {
       fontSize: 18,

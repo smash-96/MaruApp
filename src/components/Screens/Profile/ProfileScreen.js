@@ -26,6 +26,7 @@ import {
   setUserAddress,
   setUserGender,
   setUserAge,
+  setFirstSignup,
 } from "../../../slices/userInfoSlice";
 import {
   selectUserPhoto,
@@ -145,7 +146,7 @@ const ProfileScreen = (props) => {
               onPress={() => navigation.toggleDrawer()}
               activeOpacity={0.5}
             >
-              <Icon name="menu" />
+              <Icon name="menu" size={34} />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
@@ -157,7 +158,7 @@ const ProfileScreen = (props) => {
               }}
               activeOpacity={0.5}
             >
-              <Icon name="menu" color="red" />
+              <Icon name="menu" color="red" size={34} />
             </TouchableOpacity>
           )}
 
@@ -317,6 +318,7 @@ const ProfileScreen = (props) => {
       // }
 
       deviceStorage.setFirstSignup("true");
+      dispatch(setFirstSignup("true"));
 
       // if (checkProfileComplete() === true) {
       //   setBtnDisable(true);

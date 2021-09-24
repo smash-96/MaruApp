@@ -89,15 +89,16 @@ const MapScreen = (props) => {
     }
     return () => {
       isMounted = false;
-      dispatch(setActiveRequestData(null));
+      //dispatch(setActiveRequestData(null));
     };
-  });
+  }, []);
 
   useEffect(() => {
     const cRef = db.collection("requests");
     const requestDelete = cRef.onSnapshot((snapshot) => {
       snapshot.docChanges().forEach((change) => {
         if (change.type == "removed") {
+          dispatch(setActiveRequestData(null));
           clearRequest();
         }
       });
@@ -137,6 +138,7 @@ const MapScreen = (props) => {
           status: "InProgress",
           locationHelper: helperLocation,
         };
+
         dispatch(setActiveRequestData(requestData));
         // let hName = (
         //   await db.collection("Users").doc(data.helperID).get()
@@ -386,6 +388,7 @@ const MapScreen = (props) => {
   };
 
   const stateCleanUp = async () => {
+    // dispatch(setActiveRequestData(null));
     if (userType === "helper") {
       dispatch(setHelpeeLocation(null));
     } else if (userType === "helpee") {
@@ -473,16 +476,16 @@ const MapScreen = (props) => {
     }
   };
 
-  const startNavigation = async () => {
-    console.log("Start Navigation");
+  // const startNavigation = async () => {
+  //   console.log("Start Navigation");
 
-    if (!tracking) {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setTracking(true);
-    } else {
-      setTracking(false);
-    }
-  };
+  //   if (!tracking) {
+  //     await new Promise((resolve) => setTimeout(resolve, 2000));
+  //     setTracking(true);
+  //   } else {
+  //     setTracking(false);
+  //   }
+  // };
 
   return (
     <View>

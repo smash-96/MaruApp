@@ -145,7 +145,7 @@ const Map = (props) => {
   }, [loading]);
 
   const getLiveLocation = async () => {
-    // Tracking needed only for helper
+    // Tracking needed only for helpersds
     if (userType === "helper") {
       const location = await getCurrentLocation();
       animate(location);
@@ -164,12 +164,18 @@ const Map = (props) => {
 
       // Check for helper
       if (activeRequestData?.helpeeID) {
-        await db
+        const docRef = await db
           .collection("requests")
-          .doc(activeRequestData?.helpeeID)
-          .update({
-            locationHelper: helperLocation,
-          });
+          .doc(activeRequestData?.helpeeID);
+        if (docRef) {
+          try {
+            await docRef.update({
+              locationHelper: helperLocation,
+            });
+          } catch (err) {
+            console.log("getLiveLocation Error", err);
+          }
+        }
       }
     }
   };
@@ -178,22 +184,24 @@ const Map = (props) => {
     if (userType === "helpee") {
       // Check for helpee
       if (activeRequestData?.helperID) {
-        const locationData = (
-          await db.collection("requests").doc(userID).get()
-        ).data().locationHelper;
-
         try {
-          animate(locationData);
-          dispatch(
-            setHelperLocation({
-              latitude: locationData.latitude,
-              longitude: locationData.longitude,
-              latitudeDelta: LATITUDE_DELTA,
-              longitudeDelta: LONGITUDE_DELTA,
-            })
-          );
+          const docRef = await db.collection("requests").doc(userID);
+          if (docRef) {
+            const locationData = (await docRef.get()).data().locationHelper;
+
+            animate(locationData);
+            dispatch(
+              setHelperLocation({
+                latitude: locationData.latitude,
+                longitude: locationData.longitude,
+                latitudeDelta: LATITUDE_DELTA,
+                longitudeDelta: LONGITUDE_DELTA,
+              })
+            );
+          }
         } catch (err) {
-          console.log("HELPEE ERROR", err);
+          //console.log("HELPEE ERROR", err);
+          console.log("fetchLiveLocation Error", err);
         }
       }
     }

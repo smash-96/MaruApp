@@ -3,9 +3,9 @@ import uuid from "react-native-uuid";
 //import { notificationManager } from "../notifications";
 //import { IMLocalized } from "../localization/IMLocalization";
 
-const pushKitEndpoint =
-  "https://us-central1-production-a9404.cloudfunctions.net/initiateChatCall";
-const iOSBundleID = "io.instamobile.chat.rn.ios";
+// const pushKitEndpoint =
+//   "https://us-central1-production-a9404.cloudfunctions.net/initiateChatCall";
+// const iOSBundleID = "io.instamobile.chat.rn.ios";
 
 export default class AVChatCoordinator {
   constructor(apiManager) {

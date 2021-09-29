@@ -32,8 +32,8 @@ import IMWebRTCStreamManager from "../../streaming/webRTC/streamManager";
 import IMAVActiveVideoCallView from "../IMAVActiveVideoCallView/IMAVActiveVideoCallView";
 import IMAVActiveAudioCallView from "../IMAVActiveAudioCallView/IMAVActiveAudioCallView";
 
-// const API_URL =
-//   Platform.OS === "ios" ? "http://localhost:3000" : "http://10.0.2.2:3000";
+const API_URL_TEST =
+  Platform.OS === "ios" ? "http://localhost:3000" : "http://10.0.2.2:3000";
 
 const API_URL =
   "https://us-central1-volunteerteam-1c46b.cloudfunctions.net/getNTSToken?data=token";
@@ -82,11 +82,11 @@ const IMAVCallContainerView = (props) => {
       // axios.get(`${API_URL}`).then((res) => {
       //   console.log("Axios NTS TOKEN", res);
       // });
-      fetch(`${API_URL}/error`)
+      fetch(`${API_URL}`)
         .then((res) => res.json())
         .then((data) => {
           const value = { iceServers: data.iceServers };
-          console.log("NTS TOKEN", value);
+          //console.log("NTS TOKEN", value);
           setNTStoken(value);
         })
         .catch((err) => {

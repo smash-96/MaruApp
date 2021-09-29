@@ -1,4 +1,9 @@
-import React, { useState, useLayoutEffect, useRef, useEffect } from "react";
+import React, {
+  useState,
+  useLayoutEffect,
+  useCallback,
+  useEffect,
+} from "react";
 import { Avatar } from "react-native-elements";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import dynamic_styles from "./styles";
@@ -13,13 +18,13 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
-  StyleSheet,
+  BackHandler,
 } from "react-native";
 import { auth, db } from "../../../../firebase/firebaseConfig";
 import firestore from "@react-native-firebase/firestore";
 import { initiateAVCall } from "../../../avchat";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { selectUserData } from "../../../../slices/userAuthSlice";
 
 const ConvoScreen = (props) => {
@@ -64,7 +69,7 @@ const ConvoScreen = (props) => {
         <View style={{ marginLeft: 20 }}>
           <TouchableOpacity
             onPress={() => {
-              navigation.replace("ChatScreen");
+              props.navigation.replace("ChatScreen");
             }}
             activeOpacity={0.5}
           >
@@ -108,6 +113,26 @@ const ConvoScreen = (props) => {
       ),
     });
   }, [navigation]); // Update or reloads useEffect when dependent values are changed
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        props.navigation.replace("ChatScreen");
+        // Return true to stop default back navigaton
+        // Return false to keep default back navigaton
+        console.log("Back Pressed");
+        return true;
+      };
+
+      // Add Event Listener for hardwareBackPress
+      BackHandler.addEventListener("hardwareBackPress", onBackPress);
+
+      return () => {
+        // Once the Screen gets blur Remove Event Listener
+        BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+      };
+    }, [])
+  );
 
   // For Caller
   const videoCall = () => {

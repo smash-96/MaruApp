@@ -37,7 +37,7 @@ const en = {
     profile: "Profile",
     map: "Map",
     chat: "Connections",
-    logout: "Logout",
+    logout: " Logout",
   },
   profile: {
     header: "MARU Profile",

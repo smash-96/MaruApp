@@ -8,17 +8,17 @@ import {
 import InCallManager from "react-native-incall-manager";
 import RNCallKeep from "react-native-callkeep";
 
-// const servers = {
-//   iceServers: [
-//     { urls: "stun:stun.services.mozilla.com" },
-//     { urls: "stun:stun.l.google.com:19302" },
-//     {
-//       urls: "turn:numb.viagenie.ca",
-//       credential: "beaver",
-//       username: "webrtc.websitebeaver@gmail.com",
-//     },
-//   ],
-// };
+const servers = {
+  iceServers: [
+    { urls: "stun:stun.services.mozilla.com" },
+    { urls: "stun:stun.l.google.com:19302" },
+    {
+      urls: "turn:numb.viagenie.ca",
+      credential: "beaver",
+      username: "webrtc.websitebeaver@gmail.com",
+    },
+  ],
+};
 
 export default class IMWebRTCStreamManager {
   constructor(
@@ -259,7 +259,8 @@ export default class IMWebRTCStreamManager {
       if (this.peerConnections[recipientID]) {
         return this.peerConnections[recipientID];
       }
-      const pc = new RTCPeerConnection(this.ntsToken);
+      // const pc = new RTCPeerConnection(this.ntsToken);
+      const pc = new RTCPeerConnection(servers);
       pc.addStream(this.localStream);
 
       pc.onconnectionstatechange = (event) => {

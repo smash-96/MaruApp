@@ -35,8 +35,8 @@ import {
   selectActiveRequestData,
 } from "../../../slices/helpRequestSlice";
 import uuid from "react-native-uuid";
-import haversine from "haversine";
-import TNActivityIndicator from "../../Custom/TNActivityIndicator/TNActivityIndicator";
+// import haversine from "haversine";
+// import TNActivityIndicator from "../../Custom/TNActivityIndicator/TNActivityIndicator";
 import I18n from "../../../localization/utils/language";
 const { width, height } = Dimensions.get("window");
 
@@ -94,12 +94,25 @@ const MapScreen = (props) => {
   }, []);
 
   useEffect(() => {
+    const userID = props.route.params.user.uid;
     const cRef = db.collection("requests");
     const requestDelete = cRef.onSnapshot((snapshot) => {
       snapshot.docChanges().forEach((change) => {
-        if (change.type == "removed") {
-          dispatch(setActiveRequestData(null));
-          clearRequest();
+        const data = change.doc.data();
+        if (userType === "helpee" && userID === data.helpeeID) {
+          if (change.type == "removed") {
+            dispatch(setActiveRequestData(null));
+            clearRequest();
+          }
+        } else if (
+          userType === "helper" &&
+          activeRequestData?.helpeeID === data.helpeeID
+        ) {
+          if (change.type == "removed") {
+            console.log("REMOVED DATA", data);
+            dispatch(setActiveRequestData(null));
+            clearRequest();
+          }
         }
       });
     });
@@ -397,6 +410,7 @@ const MapScreen = (props) => {
     dispatch(setActiveRequestData(null));
     setNeedHelp(true);
     setGiveHelp(true);
+    setT_id(null);
   };
 
   const firestoreCleanUp = async () => {
@@ -404,33 +418,35 @@ const MapScreen = (props) => {
     let cRef;
     //cRef = db.collection("requests").doc(t_id);
     if (userType === "helper") {
+      console.log("DELETE USER ID helper", t_id);
       cRef = db.collection("requests").doc(t_id);
       try {
         if (cRef) {
-          //await cRef.delete();
-          await moveDoc(
-            "requests",
-            t_id,
-            `CompletedRequests/${t_id}/AllRequests`,
-            null,
-            uuid.v4()
-          );
+          await cRef.delete();
+          // await moveDoc(
+          //   "requests",
+          //   t_id,
+          //   `CompletedRequests/${t_id}/AllRequests`,
+          //   null,
+          //   uuid.v4()
+          // );
         }
       } catch (err) {
         console.log("ERROR1", err);
       }
     } else if (userType === "helpee") {
+      console.log("DELETE USER ID helpee", userID);
       cRef = db.collection("requests").doc(userID);
       try {
         if (cRef) {
-          //await cRef.delete();
-          await moveDoc(
-            "requests",
-            userID,
-            `CompletedRequests/${userID}/AllRequests`,
-            null,
-            uuid.v4()
-          );
+          await cRef.delete();
+          // await moveDoc(
+          //   "requests",
+          //   userID,
+          //   `CompletedRequests/${userID}/AllRequests`,
+          //   null,
+          //   uuid.v4()
+          // );
         }
       } catch (err) {
         console.log("ERROR2", err);
@@ -438,7 +454,7 @@ const MapScreen = (props) => {
     }
     try {
       db.collection("Users").doc(userID).update({
-        helpRequestID: null,
+        helpRequestID: "null",
       });
     } catch (err) {
       console.log("ERROR3", err);
@@ -476,17 +492,6 @@ const MapScreen = (props) => {
     }
   };
 
-  // const startNavigation = async () => {
-  //   console.log("Start Navigation");
-
-  //   if (!tracking) {
-  //     await new Promise((resolve) => setTimeout(resolve, 2000));
-  //     setTracking(true);
-  //   } else {
-  //     setTracking(false);
-  //   }
-  // };
-
   return (
     <View>
       <Modal transparent={true} visible={helpeeModalOpen}>
@@ -506,7 +511,6 @@ const MapScreen = (props) => {
         <View
           style={{
             marginTop: 50,
-            // flex: 1,
             justifyContent: "center",
           }}
         >

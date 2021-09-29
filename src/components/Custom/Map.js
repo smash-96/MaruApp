@@ -56,7 +56,7 @@ const Map = (props) => {
   const markerRef = useRef();
 
   useEffect(() => {
-    if (helperLocation && helpeeLocation) return;
+    // if (helperLocation && helpeeLocation) return;
     if (currentUser?.user?.location) {
       setLatitude(currentUser.user.location.latitude);
       setLongitude(currentUser.user.location.longitude);

@@ -43,16 +43,20 @@ export default class AVAPIManager {
   */
     const initiatedTimestamp = Math.round(new Date().getTime() / 1000);
 
-    const avCallsRef = db.collection("avCalls").doc(callID);
-    await avCallsRef.set({
-      callType: callType,
-      callID: callID,
-      channelName: callTitle ?? "",
-      allChannelParticipants: callParticipants,
-      activeParticipants: [currentUser],
-      status: "initiated",
-      initiatedTimestamp,
-    });
+    const avCallsRef = await db.collection("avCalls").doc(callID);
+    try {
+      await avCallsRef.set({
+        callType: callType,
+        callID: callID,
+        channelName: callTitle ?? "",
+        allChannelParticipants: callParticipants,
+        activeParticipants: [currentUser],
+        status: "initiated",
+        initiatedTimestamp,
+      });
+    } catch (err) {
+      console.log("ISSUE HERE", err);
+    }
 
     const batch = db.batch();
     callParticipants.forEach((user) => {

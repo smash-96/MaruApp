@@ -98,10 +98,13 @@ const Login = (props) => {
         if (response?.user) {
           const user = response.user;
           if (!user.emailVerified) {
+            // auth.currentUser.updateProfile({
+            //   photoURL: user.photoUrl,
+            // });
             const requestID = (
               await db.collection("Users").doc(user.uid).get()
             ).data().helpRequestID;
-            if (requestID !== null) {
+            if (requestID !== "null") {
               const requestData = (
                 await db.collection("requests").doc(requestID).get()
               ).data();
@@ -224,10 +227,13 @@ const Login = (props) => {
           const user = response.user;
 
           if (!user.emailVerified) {
+            // auth.currentUser.updateProfile({
+            //   photoURL: user.photoUrl,
+            // });
             const requestID = (
               await db.collection("Users").doc(user.uid).get()
             ).data().helpRequestID;
-            if (requestID !== null) {
+            if (requestID !== "null") {
               const requestData = (
                 await db.collection("requests").doc(requestID).get()
               ).data();

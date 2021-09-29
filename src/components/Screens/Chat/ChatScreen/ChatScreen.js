@@ -1,4 +1,9 @@
-import React, { useLayoutEffect, useState, useEffect, useRef } from "react";
+import React, {
+  useLayoutEffect,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import {
   View,
   TouchableOpacity,
@@ -7,13 +12,14 @@ import {
   NativeModules,
   LayoutAnimation,
   UIManager,
+  BackHandler,
 } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { CustomList } from "../../../Custom/CustomList";
 //import dynamicStyles from "./styles";
 import { Avatar, Icon } from "react-native-elements";
 import { auth, db } from "../../../../firebase/firebaseConfig";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
 //import tw from "tailwind-react-native-classnames";
 
@@ -92,6 +98,28 @@ const ChatScreen = (props) => {
       ),
     });
   }, [navigation]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        // props.navigation.replace("MapStack", {
+        //   screen: "MapScreen",
+        // });
+        // Return true to stop default back navigaton
+        // Return false to keep default back navigaton
+        console.log("Back Pressed");
+        return true;
+      };
+
+      // Add Event Listener for hardwareBackPress
+      BackHandler.addEventListener("hardwareBackPress", onBackPress);
+
+      return () => {
+        // Once the Screen gets blur Remove Event Listener
+        BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+      };
+    }, [])
+  );
 
   const enterChat = (id, uid, fname, lname, photo) => {
     props.navigation.navigate("ConvoScreen", {

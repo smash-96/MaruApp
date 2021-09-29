@@ -37,7 +37,7 @@ const jp = {
     profile: "プロフィール",
     map: "地図",
     chat: "接続",
-    logout: "ログアウト",
+    logout: " ログアウト",
   },
   profile: {
     header: "MARU プロフィール",

@@ -110,6 +110,8 @@ const ProfileScreen = (props) => {
 
   function checkProfileComplete() {
     if (
+      userPhoto !== null &&
+      userPhoto != baseAvatar &&
       userFname !== null &&
       userFname !== "" &&
       userLname !== null &&

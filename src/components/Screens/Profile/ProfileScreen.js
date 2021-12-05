@@ -41,6 +41,7 @@ import {
 import { selectActiveRequestData } from "../../../slices/helpRequestSlice";
 import { useNavigation } from "@react-navigation/native";
 import Picker from "../../Custom/Picker";
+import DropDownPicker from "react-native-dropdown-picker";
 import { Icon } from "react-native-elements";
 
 const ProfileScreen = (props) => {
@@ -89,6 +90,15 @@ const ProfileScreen = (props) => {
 
   const [gender, setGender] = useState("");
   const [uType, setUType] = useState("");
+
+  //new code
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(uType);
+  const [items, setItems] = useState([
+    { label: "Helper", value: "helper" },
+    { label: "Helpee", value: "helpee" },
+  ]);
+  //
 
   const getPickerValues = (index, picker_type) => {
     if (picker_type == "Gender") {
@@ -359,7 +369,7 @@ const ProfileScreen = (props) => {
 
   const setDisableBtnFromPickerChild = (child) => {
     if (checkProfileComplete() === true) {
-      // comparing equal because state is getting set after this function is execcuted
+      // comparing equal because state is getting set after this function is executed
       if (child === "userType") {
         if (userType === uType) {
           setBtnDisable(false);
@@ -494,7 +504,7 @@ const ProfileScreen = (props) => {
           </View>
 
           {/* User Type */}
-          <View style={styles.singleRow}>
+          {/* <View style={styles.singleRow}>
             <Text style={styles.left_fields}>{I18n.t("profile.type")}</Text>
             <Picker
               myValue={uType}
@@ -504,7 +514,21 @@ const ProfileScreen = (props) => {
               myplaceholder={type_placeHolder}
               parentFunc={setDisableBtnFromPickerChild}
             />
+          </View> */}
+
+          <View style={styles.singleRow}>
+            <Text style={styles.left_fields}>{I18n.t("profile.type")}</Text>
           </View>
+          <DropDownPicker
+            open={open}
+            value={uType}
+            items={items}
+            setOpen={setOpen}
+            setValue={setUType}
+            setItems={setItems}
+            onChangeValue={(value) => setDisableBtnFromPickerChild("userType")}
+            listMode="SCROLLVIEW"
+          />
         </View>
         <View style={styles.submit}>
           {uploading === true ? (

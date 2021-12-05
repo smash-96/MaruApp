@@ -18,12 +18,7 @@ const AppNavigator = () => {
 const MainNavigator = IMAVAppCallWrapper(AppNavigator);
 
 const App = () => {
-  return (
-    <MainNavigator />
-    // <NavigationContainer>
-    //   <AuthStack />
-    // </NavigationContainer>
-  );
+  return <MainNavigator />;
 };
 
 export default App;
